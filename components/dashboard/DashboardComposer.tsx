@@ -96,8 +96,11 @@ export default function DashboardComposer() {
         })}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <label className="flex flex-wrap items-center gap-2 text-sm md:text-xs" style={{ color: "var(--text-muted)" }}>
+      <div className="mt-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-3">
+        <label
+          className="flex flex-wrap items-center gap-2 text-sm md:flex-1 md:text-xs"
+          style={{ color: "var(--text-muted)" }}
+        >
           <span>时长（分钟，可选）</span>
           <input
             type="number"
@@ -118,7 +121,7 @@ export default function DashboardComposer() {
           type="button"
           onClick={submit}
           disabled={pending}
-          className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 md:px-4 md:py-2 text-base md:text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50 min-h-[48px] md:min-h-0 touch-manipulation"
+          className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl px-5 py-3 text-base font-medium transition-opacity hover:opacity-90 disabled:opacity-50 min-h-[48px] touch-manipulation md:w-auto md:px-4 md:py-2 md:text-sm md:min-h-0"
           style={{
             background: "var(--brand-subtle)",
             color: "var(--brand)",

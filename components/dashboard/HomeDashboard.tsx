@@ -113,13 +113,7 @@ export default function HomeDashboard({
               {userLabel}
             </p>
             {metrics && (
-              <div
-                className={cn(
-                  "mt-2 flex flex-wrap gap-3 text-xs",
-                  tab !== "home" && "hidden lg:flex",
-                )}
-                style={{ color: "var(--text-muted)" }}
-              >
+              <div className="mt-2 flex flex-wrap gap-3 text-xs" style={{ color: "var(--text-muted)" }}>
                 <span>
                   <strong className="font-semibold" style={{ color: "var(--text-secondary)" }}>
                     {metrics.totalRecords}

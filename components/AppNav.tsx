@@ -152,7 +152,7 @@ export default function AppNav() {
               确定要退出当前账户吗？退出后需要重新登录才能继续使用。
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex-row justify-end gap-2 border-t-0 bg-transparent p-0 pt-2 sm:justify-end">
+          <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 border-0 bg-transparent px-4 pb-4 pt-4 sm:justify-end">
             <Button
               type="button"
               variant="outline"
