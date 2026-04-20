@@ -131,7 +131,8 @@ export async function POST(req: Request) {
 
   try {
     const result = streamText({
-      model: deepseek("deepseek-chat"),
+      // 必须用 .chat：默认 deepseek(...) 走 OpenAI Responses API（/v1/responses），DeepSeek 仅支持 Chat Completions
+      model: deepseek.chat("deepseek-chat"),
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
       maxOutputTokens: 2000,
