@@ -4,7 +4,6 @@ import { addDays, format, parseISO } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import type { HeatmapCell } from "@/types";
 
-const CELL_PX = 11;
 /** 方块之间横向、纵向统一间距（像素） */
 const GAP_PX = 4;
 
@@ -31,13 +30,13 @@ export default function ActivityHeatmap({ cells, numWeeks, gridStart }: Props) {
       <p className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
         活跃度
       </p>
-      <div className="overflow-x-auto pb-1">
-        <div className="inline-flex min-w-full flex-col gap-1.5">
+      <div className="w-full min-w-0 pb-1">
+        <div className="flex w-full min-w-0 flex-col gap-1.5">
           <div
-            className="inline-grid"
+            className="grid w-full"
             style={{
-              gridTemplateColumns: `repeat(${numWeeks}, ${CELL_PX}px)`,
-              gridTemplateRows: `repeat(7, ${CELL_PX}px)`,
+              gridTemplateColumns: `repeat(${numWeeks}, minmax(0, 1fr))`,
+              gridTemplateRows: "repeat(7, auto)",
               gridAutoFlow: "column",
               rowGap: GAP_PX,
               columnGap: GAP_PX,
@@ -47,33 +46,25 @@ export default function ActivityHeatmap({ cells, numWeeks, gridStart }: Props) {
               <div
                 key={cell.date}
                 title={`${cell.date} · ${cell.count} 条记录`}
-                className="shrink-0 rounded-[2px] transition-colors"
-                style={{
-                  width: CELL_PX,
-                  height: CELL_PX,
-                  background: LEVEL_BG[cell.level],
-                }}
+                className="aspect-square min-h-0 min-w-0 w-full rounded-[2px] transition-colors"
+                style={{ background: LEVEL_BG[cell.level] }}
               />
             ))}
           </div>
           <div
-            className="grid"
+            className="grid w-full"
             style={{
-              gridTemplateColumns: `repeat(${numWeeks}, ${CELL_PX}px)`,
+              gridTemplateColumns: `repeat(${numWeeks}, minmax(0, 1fr))`,
               columnGap: GAP_PX,
             }}
           >
             {monthLabels.map((m, i) => (
               <span
                 key={i}
-                className="text-[9px] leading-none whitespace-nowrap overflow-visible block"
-                style={{
-                  color: m ? "var(--text-muted)" : "transparent",
-                  width: CELL_PX,
-                  minWidth: CELL_PX,
-                }}
+                className="block min-w-0 overflow-visible text-[9px] leading-none whitespace-nowrap"
+                style={{ color: m ? "var(--text-muted)" : "transparent" }}
               >
-                {m || "\u00a0"}
+                {m ? m : "\u00a0"}
               </span>
             ))}
           </div>
