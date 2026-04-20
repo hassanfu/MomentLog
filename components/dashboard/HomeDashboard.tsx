@@ -104,9 +104,9 @@ export default function HomeDashboard({
   }, []);
 
   return (
-    <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
-      {/* 左侧：无边框分割线 */}
-      <aside className="w-full shrink-0 space-y-5 pb-6 lg:w-[240px] lg:pb-0 lg:pr-4">
+    <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
+      {/* 左侧：移动端与主区间距仅由外层 gap-6（24px）承担，避免再给 aside 加 pb 与 gap 叠加 */}
+      <aside className="w-full shrink-0 space-y-5 lg:w-[240px] lg:pb-0 lg:pr-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>

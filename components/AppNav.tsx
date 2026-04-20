@@ -107,7 +107,7 @@ export default function AppNav() {
         style={{
           background: "var(--nav-glass-mobile)",
           backdropFilter: "blur(16px)",
-          paddingBottom: "env(safe-area-inset-bottom)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)",
         }}
       >
         {DASHBOARD_NAV.map(({ tab, label, Icon }) => {
