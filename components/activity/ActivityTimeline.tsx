@@ -13,7 +13,7 @@ export default function ActivityTimeline({ activities }: Props) {
     return (
       <div className="text-center py-16">
         <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+          className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
           style={{ background: "var(--brand-subtle)" }}
         >
           <Plus className="h-6 w-6" strokeWidth={2} style={{ color: "var(--brand)" }} aria-hidden />
@@ -21,14 +21,13 @@ export default function ActivityTimeline({ activities }: Props) {
         <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
           这里还没有记录
         </p>
-        <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+        <p className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
           记录你的第一条活动吧
         </p>
       </div>
     );
   }
 
-  // Group by date
   const grouped = activities.reduce<Record<string, Activity[]>>((acc, a) => {
     if (!acc[a.date]) acc[a.date] = [];
     acc[a.date].push(a);
@@ -38,7 +37,7 @@ export default function ActivityTimeline({ activities }: Props) {
   const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 md:space-y-10">
       {sortedDates.map((date) => {
         const dayActivities = grouped[date];
         const totalMinutes = dayActivities.reduce((s, a) => s + (a.duration_minutes ?? 0), 0);
@@ -48,17 +47,18 @@ export default function ActivityTimeline({ activities }: Props) {
 
         return (
           <div key={date}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex items-center gap-2">
+            {/* 日期抬头 */}
+            <div className="mb-4 flex items-center gap-3 md:mb-5">
+              <div className="flex flex-wrap items-center gap-2">
                 <span
-                  className="text-xs font-semibold"
+                  className="text-sm font-semibold md:text-xs"
                   style={{ color: isToday ? "var(--brand)" : "var(--text-secondary)" }}
                 >
                   {isToday ? "今天" : label}
                 </span>
                 {isToday && (
                   <span
-                    className="text-[10px] px-1.5 py-0.5 rounded-md font-medium"
+                    className="rounded-md px-1.5 py-0.5 text-[10px] font-medium md:text-[10px]"
                     style={{ background: "var(--brand-subtle)", color: "var(--brand)" }}
                   >
                     TODAY
@@ -66,20 +66,37 @@ export default function ActivityTimeline({ activities }: Props) {
                 )}
               </div>
               {totalMinutes > 0 && (
-                <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                  共 {totalMinutes >= 60 ? `${Math.floor(totalMinutes / 60)}h${totalMinutes % 60 > 0 ? ` ${totalMinutes % 60}m` : ""}` : `${totalMinutes}m`}
+                <span className="text-[11px] md:text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  共{" "}
+                  {totalMinutes >= 60
+                    ? `${Math.floor(totalMinutes / 60)}h${totalMinutes % 60 > 0 ? ` ${totalMinutes % 60}m` : ""}`
+                    : `${totalMinutes}m`}
                 </span>
               )}
-              <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
-              <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+              <div className="h-px min-w-[2rem] flex-1" style={{ background: "var(--border)" }} />
+              <span className="text-[11px] shrink-0" style={{ color: "var(--text-muted)" }}>
                 {dayActivities.length} 条
               </span>
             </div>
 
-            <div className="space-y-2">
-              {dayActivities.map((activity) => (
-                <ActivityCard key={activity.id} activity={activity} />
-              ))}
+            {/* 左侧竖线 + 条目（加密快讯式时间轴） */}
+            <div className="relative">
+              {/* 贯穿当日的竖线，与节点圆点中心对齐（w-7 → 圆心约 14px） */}
+              <div
+                className="pointer-events-none absolute top-3 bottom-4 left-[13px] z-0 w-px md:left-[15px]"
+                style={{ background: "var(--border-strong)" }}
+                aria-hidden
+              />
+
+              <div className="relative z-[1]">
+                {dayActivities.map((activity, index) => (
+                  <ActivityCard
+                    key={activity.id}
+                    activity={activity}
+                    isLastInDay={index === dayActivities.length - 1}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         );

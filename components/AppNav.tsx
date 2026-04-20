@@ -3,24 +3,57 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { signOut } from "@/lib/actions/auth";
-import type { User } from "@supabase/supabase-js";
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { DASHBOARD_NAV, hrefForDashboardTab, tabFromSearchParams } from "@/lib/dashboard-nav";
-import { Layers, User as UserIcon } from "lucide-react";
+import {
+  DASHBOARD_NAV,
+  DASHBOARD_TAB_NAV_EVENT,
+  navigateDashboardTab,
+  tabFromSearchParams,
+  type DashboardTabKey,
+} from "@/lib/dashboard-nav";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Layers, LogOut } from "lucide-react";
 
-export default function AppNav({ user }: { user: User }) {
+export default function AppNav() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [pending, startTransition] = useTransition();
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
-  const dashboardActiveTab = pathname === "/" ? tabFromSearchParams(searchParams) : null;
+  /** 与 HomeDashboard 同步：客户端 tab 事件 + URL，避免 Link 触发的软导航滞后 */
+  const [dashboardTab, setDashboardTab] = useState<DashboardTabKey | null>(() =>
+    pathname === "/" ? tabFromSearchParams(searchParams) : null,
+  );
 
-  async function handleSignOut() {
+  useEffect(() => {
+    if (pathname === "/") setDashboardTab(tabFromSearchParams(searchParams));
+    else setDashboardTab(null);
+  }, [pathname, searchParams]);
+
+  useEffect(() => {
+    const onTab = (e: Event) => {
+      const t = (e as CustomEvent<DashboardTabKey>).detail;
+      if (t === "home" || t === "timeline" || t === "briefs") setDashboardTab(t);
+    };
+    window.addEventListener(DASHBOARD_TAB_NAV_EVENT, onTab as EventListener);
+    return () => window.removeEventListener(DASHBOARD_TAB_NAV_EVENT, onTab as EventListener);
+  }, []);
+
+  function executeSignOut() {
     startTransition(async () => {
       const r = await signOut();
       if (r.ok) {
+        setLogoutConfirmOpen(false);
         router.push("/login");
         router.refresh();
       }
@@ -50,18 +83,16 @@ export default function AppNav({ user }: { user: User }) {
             <ThemeToggle />
             <button
               type="button"
-              onClick={handleSignOut}
+              onClick={() => setLogoutConfirmOpen(true)}
               disabled={pending}
-              className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-medium transition-all hover:opacity-80 disabled:opacity-50"
-              style={{ color: "var(--text-muted)", background: "var(--brand-subtle)" }}
+              aria-label="退出登录"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{
+                background: "var(--brand-subtle)",
+                color: "var(--brand)",
+              }}
             >
-              <span
-                className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
-                style={{ background: "var(--brand)" }}
-              >
-                {(user.email?.[0] ?? "U").toUpperCase()}
-              </span>
-              {pending ? "…" : "退出"}
+              <LogOut className="h-4 w-4" strokeWidth={2} aria-hidden />
             </button>
           </div>
         </div>
@@ -86,13 +117,12 @@ export default function AppNav({ user }: { user: User }) {
         }}
       >
         {DASHBOARD_NAV.map(({ tab, label, Icon }) => {
-          const active = dashboardActiveTab === tab;
+          const active = pathname === "/" && dashboardTab === tab;
           return (
-            <Link
+            <button
               key={tab}
-              href={hrefForDashboardTab(tab)}
-              replace
-              scroll={false}
+              type="button"
+              onClick={() => navigateDashboardTab(tab)}
               className="flex flex-col items-center justify-center gap-0.5 py-3 transition-opacity hover:opacity-90"
               style={{
                 color: active ? "var(--brand)" : "var(--text-muted)",
@@ -100,20 +130,56 @@ export default function AppNav({ user }: { user: User }) {
             >
               <Icon className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
               <span className="text-[10px] font-medium">{label}</span>
-            </Link>
+            </button>
           );
         })}
         <button
           type="button"
-          onClick={handleSignOut}
+          onClick={() => setLogoutConfirmOpen(true)}
           disabled={pending}
+          aria-label="退出登录"
           className="flex flex-col items-center justify-center gap-0.5 py-3 transition-opacity hover:opacity-80 disabled:opacity-50"
           style={{ color: "var(--text-muted)" }}
         >
-          <UserIcon className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
+          <LogOut className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
           <span className="text-[10px] font-medium">{pending ? "…" : "退出"}</span>
         </button>
       </nav>
+
+      <Dialog open={logoutConfirmOpen} onOpenChange={setLogoutConfirmOpen}>
+        <DialogContent
+          className="sm:max-w-sm"
+          style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
+          showCloseButton
+        >
+          <DialogHeader>
+            <DialogTitle style={{ color: "var(--text-primary)" }}>退出登录</DialogTitle>
+            <DialogDescription style={{ color: "var(--text-muted)" }}>
+              确定要退出当前账户吗？退出后需要重新登录才能继续使用。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-row justify-end gap-2 border-t-0 bg-transparent p-0 pt-2 sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={pending}
+              onClick={() => setLogoutConfirmOpen(false)}
+              className="touch-manipulation"
+            >
+              取消
+            </Button>
+            <Button
+              type="button"
+              disabled={pending}
+              onClick={executeSignOut}
+              className="touch-manipulation text-white"
+              style={{ background: "var(--brand)" }}
+            >
+              {pending ? "退出中…" : "退出"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

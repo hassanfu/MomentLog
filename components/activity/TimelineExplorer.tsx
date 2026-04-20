@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition } from "react";
 import { getActivities } from "@/lib/actions/activities";
 import ActivityTimeline from "@/components/activity/ActivityTimeline";
+import TimelineListSkeleton from "@/components/activity/TimelineListSkeleton";
 import type { Activity, PeriodType } from "@/types";
 import {
   format,
@@ -134,11 +135,7 @@ export default function TimelineExplorer() {
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 animate-pulse rounded-2xl" style={{ background: "var(--surface-elevated)" }} />
-          ))}
-        </div>
+        <TimelineListSkeleton rows={4} />
       ) : (
         <ActivityTimeline activities={activities} />
       )}

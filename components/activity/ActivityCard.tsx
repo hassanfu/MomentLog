@@ -25,7 +25,13 @@ const TAG_COLORS: Record<string, string> = {
   "#休息": "#d97757",
 };
 
-export default function ActivityCard({ activity }: { activity: Activity }) {
+interface ActivityCardProps {
+  activity: Activity;
+  /** 当日最后一条：底部不分隔线 */
+  isLastInDay?: boolean;
+}
+
+export default function ActivityCard({ activity, isLastInDay }: ActivityCardProps) {
   const [editing, setEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -45,72 +51,87 @@ export default function ActivityCard({ activity }: { activity: Activity }) {
 
   return (
     <>
-      <div
-        className="fade-up group rounded-2xl p-4 transition-all hover:shadow-sm"
-        style={{
-          background: "var(--surface-elevated)",
-          border: "1px solid var(--border)",
-        }}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium leading-snug" style={{ color: "var(--text-primary)" }}>
-              {activity.description}
-            </p>
+      <div className="fade-up group relative flex gap-3 md:gap-4">
+        {/* 时间轴节点（竖线由 ActivityTimeline 按日绘制） */}
+        <div className="relative z-[2] flex w-7 shrink-0 justify-center md:w-8">
+          <span
+            className="mt-2 block h-2.5 w-2.5 shrink-0 rounded-full md:h-3 md:w-3"
+            style={{
+              background: "var(--brand)",
+              boxShadow: "0 0 0 3px var(--surface)",
+            }}
+            aria-hidden
+          />
+        </div>
 
-            {activity.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {activity.tags.map((tag) => {
-                  const color = TAG_COLORS[tag] ?? "var(--brand)";
-                  return (
-                    <span
-                      key={tag}
-                      className="px-2 py-0.5 rounded-md text-[11px] font-medium"
-                      style={{ background: `${color}18`, color }}
-                    >
-                      {tag}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-
-            <div className="flex items-center gap-3 mt-2">
-              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-                {timeStr}
-              </span>
-              {activity.duration_minutes && (
-                <span
-                  className="text-xs px-2 py-0.5 rounded-md font-medium"
-                  style={{ background: "var(--brand-subtle)", color: "var(--brand)" }}
-                >
-                  {activity.duration_minutes >= 60
-                    ? `${Math.floor(activity.duration_minutes / 60)}h${activity.duration_minutes % 60 > 0 ? ` ${activity.duration_minutes % 60}m` : ""}`
-                    : `${activity.duration_minutes}m`}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div
+          className={`relative min-w-0 flex-1 pb-6 pt-0.5 md:pb-7 ${!isLastInDay ? "border-b border-[color:var(--border)]" : ""}`}
+        >
+          {/* 悬停操作 */}
+          <div className="absolute right-0 top-0 z-[1] flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
             <button
+              type="button"
               onClick={() => setEditing(true)}
-              className="p-1.5 rounded-lg transition-all hover:opacity-70"
+              className="rounded-lg p-2 transition-all hover:opacity-70 md:p-1.5"
               style={{ color: "var(--text-muted)" }}
               aria-label="编辑"
             >
-              <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
+              <Pencil className="h-4 w-4 md:h-3.5 md:w-3.5" strokeWidth={2} />
             </button>
             <button
+              type="button"
               onClick={handleDelete}
               disabled={isPending}
-              className="p-1.5 rounded-lg transition-all hover:opacity-70 disabled:opacity-30"
+              className="rounded-lg p-2 transition-all hover:opacity-70 disabled:opacity-30 md:p-1.5"
               style={{ color: "#ef4444" }}
               aria-label="删除"
             >
-              <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
+              <Trash2 className="h-4 w-4 md:h-3.5 md:w-3.5" strokeWidth={2} />
             </button>
           </div>
+
+          {/* 时间 / 时长 — 顶部弱对比一行（类似快讯 meta） */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pr-14 md:pr-12">
+            <span className="text-xs tabular-nums md:text-[11px]" style={{ color: "var(--text-muted)" }}>
+              {timeStr}
+            </span>
+            {activity.duration_minutes ? (
+              <span
+                className="text-[11px] font-medium tabular-nums md:text-[10px]"
+                style={{ color: "var(--text-muted)" }}
+              >
+                {activity.duration_minutes >= 60
+                  ? `${Math.floor(activity.duration_minutes / 60)}h${activity.duration_minutes % 60 > 0 ? ` ${activity.duration_minutes % 60}m` : ""}`
+                  : `${activity.duration_minutes} 分钟`}
+              </span>
+            ) : null}
+          </div>
+
+          {/* 正文 */}
+          <p
+            className="mt-2 text-base font-medium leading-snug md:text-sm"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {activity.description}
+          </p>
+
+          {/* 标签 */}
+          {activity.tags.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {activity.tags.map((tag) => {
+                const color = TAG_COLORS[tag] ?? "var(--brand)";
+                return (
+                  <span
+                    key={tag}
+                    className="rounded-md px-2 py-0.5 text-xs font-medium md:text-[11px]"
+                    style={{ background: `${color}18`, color }}
+                  >
+                    {tag}
+                  </span>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 

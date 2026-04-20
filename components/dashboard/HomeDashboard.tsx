@@ -1,23 +1,60 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import type { HeatmapCell } from "@/types";
 import type { Activity } from "@/types";
 import ActivityHeatmap from "@/components/dashboard/ActivityHeatmap";
 import ActivityTimeline from "@/components/activity/ActivityTimeline";
+import TimelineListSkeleton from "@/components/activity/TimelineListSkeleton";
 import DashboardComposer from "@/components/dashboard/DashboardComposer";
-import TimelineExplorer from "@/components/activity/TimelineExplorer";
-import BriefPanel from "@/components/brief/BriefPanel";
 import {
   DASHBOARD_NAV,
-  hrefForDashboardTab,
+  DASHBOARD_TAB_NAV_EVENT,
+  navigateDashboardTab,
   tabFromSearchParams,
   type DashboardTabKey,
 } from "@/lib/dashboard-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Hand } from "lucide-react";
+
+/** 首次切入「时间线 / AI 简报」时才加载对应 chunk，减轻首屏 JS */
+function TabPanelFallback() {
+  return (
+    <div className="space-y-4" aria-busy="true" aria-label="加载中">
+      <div className="h-5 w-36 animate-pulse rounded-md" style={{ background: "var(--surface-elevated)" }} />
+      <div className="h-52 animate-pulse rounded-2xl border" style={{ background: "var(--surface-elevated)", borderColor: "var(--border)" }} />
+      <div className="h-24 animate-pulse rounded-2xl" style={{ background: "var(--surface-elevated)" }} />
+    </div>
+  );
+}
+
+function TimelineTabChunkFallback() {
+  return (
+    <div className="space-y-5" aria-busy aria-label="加载中">
+      <div className="h-7 w-20 animate-pulse rounded-md" style={{ background: "var(--surface-elevated)" }} />
+      <div className="h-10 animate-pulse rounded-xl" style={{ background: "var(--surface-elevated)" }} />
+      <div className="flex items-center justify-between gap-4 px-1">
+        <div className="h-8 w-8 shrink-0 animate-pulse rounded-lg" style={{ background: "var(--surface-elevated)" }} />
+        <div
+          className="mx-auto h-5 max-w-[14rem] flex-1 animate-pulse rounded"
+          style={{ background: "var(--surface-elevated)" }}
+        />
+        <div className="h-8 w-8 shrink-0 animate-pulse rounded-lg" style={{ background: "var(--surface-elevated)" }} />
+      </div>
+      <TimelineListSkeleton rows={4} />
+    </div>
+  );
+}
+
+const TimelineExplorer = dynamic(() => import("@/components/activity/TimelineExplorer"), {
+  loading: () => <TimelineTabChunkFallback />,
+});
+
+const BriefPanel = dynamic(() => import("@/components/brief/BriefPanel"), {
+  loading: () => <TabPanelFallback />,
+});
 
 interface Props {
   heatmap: { cells: HeatmapCell[]; numWeeks: number; gridStart: string } | null;
@@ -45,10 +82,18 @@ export default function HomeDashboard({
     setTab(tabFromSearchParams(searchParams));
   }, [searchParams]);
 
+  /** 与其它入口（底部导航）同一套客户端切换，无 Next Link 导航延迟 */
+  useEffect(() => {
+    const onNav = (e: Event) => {
+      const t = (e as CustomEvent<TabKey>).detail;
+      if (t === "home" || t === "timeline" || t === "briefs") setTab(t);
+    };
+    window.addEventListener(DASHBOARD_TAB_NAV_EVENT, onNav as EventListener);
+    return () => window.removeEventListener(DASHBOARD_TAB_NAV_EVENT, onNav as EventListener);
+  }, []);
+
   const selectTab = useCallback((t: TabKey) => {
-    setTab(t);
-    const href = hrefForDashboardTab(t);
-    window.history.replaceState(window.history.state, "", href);
+    navigateDashboardTab(t);
   }, []);
 
   useEffect(() => {
@@ -104,12 +149,11 @@ export default function HomeDashboard({
           {DASHBOARD_NAV.map(({ tab: t, label, Icon }) => {
             const active = tab === t;
             return (
-              <Link
+              <button
                 key={t}
-                href={hrefForDashboardTab(t)}
-                replace
-                scroll={false}
-                className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-[background,color] duration-150 ease-out hover:bg-[var(--brand-subtle-hover)] ${
+                type="button"
+                onClick={() => navigateDashboardTab(t)}
+                className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-[background,color] duration-150 ease-out hover:bg-[var(--brand-subtle-hover)] ${
                   active
                     ? "bg-[var(--brand-subtle)] text-[var(--brand)] hover:bg-[var(--brand-subtle-hover)]"
                     : "bg-transparent text-[var(--text-secondary)] hover:text-[var(--brand)]"
@@ -117,7 +161,7 @@ export default function HomeDashboard({
               >
                 <Icon className="h-4 w-4 shrink-0 opacity-90" strokeWidth={2} aria-hidden />
                 {label}
-              </Link>
+              </button>
             );
           })}
         </nav>
