@@ -174,13 +174,7 @@ export default function BriefPanel() {
     Boolean(completion?.trim()) && !isLoading && parsedCompletion && shouldUseBriefLayout(parsedCompletion);
 
   return (
-    <div
-      className="brief-skin-v21 brief-card-elevated space-y-8 rounded-[28px] border px-5 py-7 sm:px-9 sm:py-10"
-      style={{
-        background: "#f5f4ed",
-        borderColor: "var(--border)",
-      }}
-    >
+    <div className="space-y-8 px-0.5 sm:px-0">
       <div>
         <h1 className="brief-serif-heading text-xl leading-[1.15] sm:text-[1.35rem]">AI 简报</h1>
         <p className="mt-2 max-w-xl text-[0.9375rem] leading-relaxed" style={{ color: "var(--text-muted)" }}>

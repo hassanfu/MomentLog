@@ -124,7 +124,83 @@ body {
   animation: fadeUp 0.3s ease forwards;
 }
 
-/* ── AI 简报 2.1：Claude-like 羊皮纸局部主题（Design doc: 「AI 简报 2.1.rtf」）── */
+/* ── AI 简报 2.1：套在「AI 简报」整栏（侧栏+主内容），覆盖全局紫品牌与热力图（Design doc: 「AI 简报 2.1.rtf」）── */
+.brief-layout-v21 {
+  --brand: #c96442;
+  --brand-dark: #a85435;
+  --brand-deep: #8f4028;
+  --brand-subtle: rgba(201, 100, 66, 0.16);
+  --brand-subtle-hover: rgba(201, 100, 66, 0.26);
+
+  --text-primary: #141413;
+  --text-secondary: #5e5d59;
+  --text-muted: #87867f;
+
+  --surface: #f5f4ed;
+  --surface-elevated: #faf9f5;
+  --surface-warm-sand: #e8e6dc;
+
+  --border: #f0eee6;
+  --border-strong: #e8e6dc;
+  --border-subtle: rgba(94, 93, 89, 0.12);
+
+  --heatmap-0: #ebe8df;
+  --heatmap-1: rgba(201, 100, 66, 0.22);
+  --heatmap-2: rgba(201, 100, 66, 0.42);
+  --heatmap-3: rgba(201, 100, 66, 0.62);
+  --heatmap-4: #c96442;
+
+  --brief-error: #b53333;
+  --brief-error-bg: rgba(181, 51, 51, 0.09);
+  --brief-error-border: rgba(181, 51, 51, 0.22);
+
+  /* 深色模式下整栏仍用羊皮纸浅色，避免侧栏仍是紫/对比错误 */
+  color-scheme: light;
+  background: #f5f4ed;
+  border-radius: 28px;
+  padding: 1.25rem 1rem;
+  box-shadow: rgba(0, 0, 0, 0.06) 0px 4px 28px;
+  border: 1px solid var(--border);
+
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+@media (min-width: 1024px) {
+  .brief-layout-v21 {
+    padding: 1.5rem 1.75rem;
+  }
+}
+
+.brief-layout-v21 .brief-serif-heading {
+  font-family: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.brief-layout-v21 .brief-section-overline {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.brief-layout-v21 article h1,
+.brief-layout-v21 article h2,
+.brief-layout-v21 article h3 {
+  font-family: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.brief-layout-v21 .brief-card-elevated {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 4px 24px;
+}
+
+/* BriefPanel 内层（无二次整页底色时仍兼容单独使用） */
 .brief-skin-v21 {
   --brand: #c96442;
   --brand-dark: #a85435;
