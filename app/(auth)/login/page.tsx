@@ -75,7 +75,7 @@ export default function LoginPage() {
           <h1 className="text-2xl tracking-tight" style={{ color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
             MomentLog
           </h1>
-          <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
+          <p className="mt-1 text-base md:text-sm" style={{ color: "var(--text-muted)" }}>
             记录当下，洞见未来
           </p>
         </div>
@@ -92,7 +92,7 @@ export default function LoginPage() {
             type="button"
             onClick={handleGoogle}
             disabled={isPending}
-            className="w-full flex items-center justify-center gap-2.5 py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-90 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2.5 py-3 md:py-2.5 rounded-xl text-base md:text-sm font-medium transition-all hover:opacity-90 disabled:opacity-50"
             style={{
               background: "var(--surface)",
               border: "1px solid var(--border)",
@@ -111,13 +111,13 @@ export default function LoginPage() {
 
           <div className="flex items-center gap-3">
             <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
-            <span className="text-xs" style={{ color: "var(--text-muted)" }}>或</span>
+            <span className="text-sm md:text-xs" style={{ color: "var(--text-muted)" }}>或</span>
             <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
           </div>
 
           <form action={handleEmail} className="space-y-3">
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
+              <label className="block text-sm md:text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
                 邮箱地址
               </label>
               <input
@@ -125,7 +125,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 placeholder="you@example.com"
-                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-all"
+                className="w-full px-3 py-3 md:py-2.5 rounded-xl text-base md:text-sm outline-none transition-all"
                 style={{
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
@@ -136,7 +136,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
+              <label className="block text-sm md:text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
                 密码
               </label>
               <input
@@ -144,7 +144,7 @@ export default function LoginPage() {
                 type="password"
                 required
                 placeholder="••••••••"
-                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-all"
+                className="w-full px-3 py-3 md:py-2.5 rounded-xl text-base md:text-sm outline-none transition-all"
                 style={{
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
@@ -157,14 +157,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+              className="w-full py-3 md:py-2.5 rounded-xl text-base md:text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
               style={{ background: "var(--brand)" }}
             >
               {isPending ? "处理中…" : mode === "signin" ? "登录" : "注册"}
             </button>
           </form>
 
-          <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
+          <p className="text-center text-sm md:text-xs" style={{ color: "var(--text-muted)" }}>
             {mode === "signin" ? "还没有账户？" : "已有账户？"}
             <button
               type="button"

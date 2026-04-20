@@ -57,7 +57,7 @@ export default function DashboardComposer() {
 
   return (
     <div
-      className="rounded-2xl border p-4"
+      className="rounded-2xl border p-5 md:p-4"
       style={{
         background: "var(--surface-elevated)",
         borderColor: "var(--border)",
@@ -69,7 +69,7 @@ export default function DashboardComposer() {
         onChange={(e) => setDesc(e.target.value)}
         placeholder="现在的想法是…"
         rows={5}
-        className="w-full resize-none bg-transparent text-sm outline-none placeholder:opacity-70"
+        className="w-full resize-none bg-transparent text-base md:text-sm leading-relaxed outline-none placeholder:opacity-70"
         style={{ color: "var(--text-primary)" }}
       />
 
@@ -82,7 +82,7 @@ export default function DashboardComposer() {
               key={tag}
               type="button"
               onClick={() => toggleTag(tag)}
-              className="rounded-lg px-2.5 py-1 text-xs font-medium transition-all"
+              className="rounded-lg px-3 py-1.5 text-sm md:text-xs font-medium transition-all min-h-[40px] md:min-h-0"
               style={{
                 background: on ? `${color}22` : "var(--surface)",
                 color: on ? color : "var(--text-muted)",
@@ -96,7 +96,7 @@ export default function DashboardComposer() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <label className="flex items-center gap-2 text-xs" style={{ color: "var(--text-muted)" }}>
+        <label className="flex flex-wrap items-center gap-2 text-sm md:text-xs" style={{ color: "var(--text-muted)" }}>
           <span>时长（分钟，可选）</span>
           <input
             type="number"
@@ -105,7 +105,7 @@ export default function DashboardComposer() {
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
             placeholder="—"
-            className="w-20 rounded-lg border px-2 py-1 text-xs outline-none"
+            className="w-[5.5rem] rounded-lg border px-3 py-2 md:py-1 text-base md:text-xs outline-none min-h-[44px] md:min-h-0"
             style={{
               background: "var(--surface)",
               borderColor: "var(--border)",
@@ -117,7 +117,7 @@ export default function DashboardComposer() {
           type="button"
           onClick={submit}
           disabled={pending}
-          className="rounded-xl px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-xl px-6 py-3 md:py-2 text-base md:text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 min-h-[48px] md:min-h-0 touch-manipulation"
           style={{ background: "var(--brand)" }}
         >
           {pending ? "保存中…" : "保存记录"}

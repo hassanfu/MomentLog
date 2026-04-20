@@ -74,7 +74,7 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Date */}
       <div>
-        <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
+        <label className="block text-sm md:text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
           日期
         </label>
         <input
@@ -82,7 +82,7 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
           type="date"
           required
           defaultValue={activity?.date ?? format(new Date(), "yyyy-MM-dd")}
-          className="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-all"
+          className="w-full px-3 py-3 md:py-2.5 rounded-xl text-base md:text-sm outline-none transition-all min-h-[48px] md:min-h-0"
           style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
           onFocus={(e) => (e.target.style.borderColor = "var(--brand)")}
           onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
@@ -91,7 +91,7 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
 
       {/* Description */}
       <div>
-        <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
+        <label className="block text-sm md:text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
           在做什么？
         </label>
         <textarea
@@ -100,7 +100,7 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
           rows={3}
           defaultValue={activity?.description ?? ""}
           placeholder="例：完成了产品需求文档，整理了本周会议笔记..."
-          className="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-all resize-none"
+          className="w-full px-3 py-3 md:py-2.5 rounded-xl text-base md:text-sm outline-none transition-all resize-none leading-relaxed"
           style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
           onFocus={(e) => (e.target.style.borderColor = "var(--brand)")}
           onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
@@ -109,7 +109,7 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
 
       {/* Tags */}
       <div>
-        <label className="block text-xs font-medium mb-2" style={{ color: "var(--text-secondary)" }}>
+        <label className="block text-sm md:text-xs font-medium mb-2" style={{ color: "var(--text-secondary)" }}>
           标签
         </label>
         <div className="flex flex-wrap gap-2 mb-2">
@@ -121,7 +121,7 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
                 key={tag}
                 type="button"
                 onClick={() => toggleTag(tag)}
-                className="tag-chip px-3 py-1 rounded-lg text-xs font-medium transition-all"
+                className="tag-chip px-3 py-1.5 md:py-1 rounded-lg text-sm md:text-xs font-medium transition-all min-h-[40px] md:min-h-0"
                 style={{
                   background: active ? `${color}20` : "var(--surface-elevated)",
                   color: active ? color : "var(--text-muted)",
@@ -140,13 +140,13 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
             onChange={(e) => setCustomTag(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomTag())}
             placeholder="自定义标签"
-            className="flex-1 px-3 py-2 rounded-xl text-xs outline-none"
+            className="flex-1 px-3 py-3 md:py-2 rounded-xl text-base md:text-xs outline-none min-h-[48px] md:min-h-0"
             style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
           />
           <button
             type="button"
             onClick={addCustomTag}
-            className="px-3 py-2 rounded-xl text-xs font-medium"
+            className="px-4 py-3 md:py-2 rounded-xl text-base md:text-xs font-medium min-h-[48px] md:min-h-0 touch-manipulation"
             style={{ background: "var(--brand-subtle)", color: "var(--brand)" }}
           >
             添加
@@ -171,7 +171,7 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
 
       {/* Duration */}
       <div>
-        <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
+        <label className="block text-sm md:text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
           时长（分钟，可选）
         </label>
         <input
@@ -181,7 +181,7 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
           max="1440"
           defaultValue={activity?.duration_minutes ?? ""}
           placeholder="如 90"
-          className="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-all"
+          className="w-full px-3 py-3 md:py-2.5 rounded-xl text-base md:text-sm outline-none transition-all min-h-[48px] md:min-h-0"
           style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
           onFocus={(e) => (e.target.style.borderColor = "var(--brand)")}
           onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
@@ -192,7 +192,7 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+        className="w-full py-3.5 md:py-3 rounded-xl text-base md:text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50 min-h-[52px] md:min-h-0 touch-manipulation"
         style={{ background: "var(--brand)" }}
       >
         {isPending ? "保存中…" : activity ? "更新记录" : "保存记录"}

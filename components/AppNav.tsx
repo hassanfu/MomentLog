@@ -1,16 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { signOut } from "@/lib/actions/auth";
 import type { User } from "@supabase/supabase-js";
 import { useTransition } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { DASHBOARD_NAV, hrefForDashboardTab, tabFromSearchParams } from "@/lib/dashboard-nav";
 import { Layers, User as UserIcon } from "lucide-react";
 
 export default function AppNav({ user }: { user: User }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [pending, startTransition] = useTransition();
+
+  const dashboardActiveTab = pathname === "/" ? tabFromSearchParams(searchParams) : null;
 
   async function handleSignOut() {
     startTransition(async () => {
@@ -62,26 +67,50 @@ export default function AppNav({ user }: { user: User }) {
         </div>
       </header>
 
-      <div className="fixed right-3 top-3 z-50 md:hidden" style={{ paddingTop: "env(safe-area-inset-top)" }}>
-        <ThemeToggle />
-      </div>
+      {/* 首页主题切换在 HomeDashboard 用户信息行顶对齐；其它路径保留右上角 */}
+      {pathname !== "/" && (
+        <div
+          className="fixed right-4 z-50 md:hidden"
+          style={{ top: "calc(env(safe-area-inset-top, 0px) + 1.5rem)" }}
+        >
+          <ThemeToggle />
+        </div>
+      )}
 
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 flex md:hidden"
+        className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 md:hidden"
         style={{
           background: "var(--nav-glass-mobile)",
           backdropFilter: "blur(16px)",
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
+        {DASHBOARD_NAV.map(({ tab, label, Icon }) => {
+          const active = dashboardActiveTab === tab;
+          return (
+            <Link
+              key={tab}
+              href={hrefForDashboardTab(tab)}
+              replace
+              scroll={false}
+              className="flex flex-col items-center justify-center gap-0.5 py-3 transition-opacity hover:opacity-90"
+              style={{
+                color: active ? "var(--brand)" : "var(--text-muted)",
+              }}
+            >
+              <Icon className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
+              <span className="text-[10px] font-medium">{label}</span>
+            </Link>
+          );
+        })}
         <button
           type="button"
           onClick={handleSignOut}
           disabled={pending}
-          className="flex w-full flex-col items-center gap-0.5 py-3 transition-opacity hover:opacity-80 disabled:opacity-50"
+          className="flex flex-col items-center justify-center gap-0.5 py-3 transition-opacity hover:opacity-80 disabled:opacity-50"
           style={{ color: "var(--text-muted)" }}
         >
-          <UserIcon className="h-5 w-5" strokeWidth={2} aria-hidden />
+          <UserIcon className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
           <span className="text-[10px] font-medium">{pending ? "…" : "退出"}</span>
         </button>
       </nav>

@@ -103,6 +103,27 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* 移动端：略增大基准字号，利于阅读；避免 iOS 在聚焦小字号输入框时强制缩放整页 */
+@media (max-width: 1023px) {
+  html {
+    font-size: 106.25%;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+  textarea,
+  select {
+    font-size: max(16px, 1rem);
+  }
+
+  button,
+  [role="button"],
+  a[href] {
+    touch-action: manipulation;
+  }
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
