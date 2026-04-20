@@ -54,7 +54,7 @@ function BriefMarkdownBody({ text }: { text: string }) {
   const src = stripOuterMarkdownFence(text);
   return (
     <article
-      className="[&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-2 [&_h3:first-child]:mt-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-1 [&_p]:my-2 [&_strong]:font-semibold [&_a]:underline [&_a]:opacity-90"
+      className="[&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-base [&_h3]:font-medium [&_h3:first-child]:mt-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-1 [&_p]:my-2 [&_strong]:font-medium [&_a]:underline [&_a]:opacity-90"
       style={{ color: "var(--text-primary)" }}
     >
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{src}</ReactMarkdown>
@@ -174,28 +174,33 @@ export default function BriefPanel() {
     Boolean(completion?.trim()) && !isLoading && parsedCompletion && shouldUseBriefLayout(parsedCompletion);
 
   return (
-    <div className="space-y-8">
+    <div
+      className="brief-skin-v21 brief-card-elevated space-y-8 rounded-[28px] border px-5 py-7 sm:px-9 sm:py-10"
+      style={{
+        background: "#f5f4ed",
+        borderColor: "var(--border)",
+      }}
+    >
       <div>
-        <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
-          AI 简报
-        </h1>
-        <p className="text-sm mt-0.5" style={{ color: "var(--text-muted)" }}>
+        <h1 className="brief-serif-heading text-xl leading-[1.15] sm:text-[1.35rem]">AI 简报</h1>
+        <p className="mt-2 max-w-xl text-[0.9375rem] leading-relaxed" style={{ color: "var(--text-muted)" }}>
           基于你的记录生成回顾；需要保留时在「本次生成」里点保存，再在下方列表中删除或发邮件
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2.5">
         {PERIOD_OPTIONS.map(({ value, label, emoji }) => (
           <button
             key={value}
             type="button"
             onClick={() => generateBrief(value)}
             disabled={isLoading}
-            className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium transition-all hover:opacity-90 disabled:opacity-50 text-left"
+            className="flex items-center gap-2.5 px-4 py-3 rounded-[10px] text-[15px] font-medium leading-snug transition-all hover:opacity-95 disabled:opacity-50 text-left"
             style={{
-              background: activeStyle(value) ? "var(--brand)" : "var(--surface-elevated)",
-              color: activeStyle(value) ? "white" : "var(--text-primary)",
-              border: `1px solid ${activeStyle(value) ? "var(--brand)" : "var(--border)"}`,
+              background: activeStyle(value) ? "var(--brand)" : "var(--surface-warm-sand)",
+              color: activeStyle(value) ? "#faf9f5" : "var(--text-primary)",
+              border: `1px solid ${activeStyle(value) ? "var(--brand)" : "var(--border-strong)"}`,
+              boxShadow: activeStyle(value) ? "none" : "0 0 0 1px rgba(209, 207, 197, 0.45)",
             }}
           >
             <span className="text-base">{emoji}</span>
@@ -203,8 +208,8 @@ export default function BriefPanel() {
             {isLoading && period === value && (
               <span className="ml-auto">
                 <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
-                  <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                  <circle cx="12" cy="12" r="10" stroke="rgba(250,249,245,0.35)" strokeWidth="3" />
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="#faf9f5" strokeWidth="3" strokeLinecap="round" />
                 </svg>
               </span>
             )}
@@ -214,13 +219,11 @@ export default function BriefPanel() {
 
       {(isLoading || hasOutput || error) && (
         <div className="space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-            本次生成
-          </p>
+          <p className="brief-section-overline">本次生成</p>
           {isLoading && !hasOutput && (
             <div
-              className="rounded-2xl p-6 flex items-center gap-3"
-              style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
+              className="brief-card-elevated flex items-center gap-3 rounded-2xl border p-6"
+              style={{ background: "var(--surface-elevated)", borderColor: "var(--border)" }}
             >
               <svg className="animate-spin shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="var(--brand)" strokeOpacity="0.25" strokeWidth="3" />
@@ -233,8 +236,10 @@ export default function BriefPanel() {
           )}
 
           {error && (
-            <div className="rounded-xl p-4" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
-              <p className="text-sm text-red-500">生成失败：{formatBriefApiErrorMessage(error)}</p>
+            <div className="rounded-[12px] border p-4" style={{ background: "var(--brief-error-bg)", borderColor: "var(--brief-error-border)" }}>
+              <p className="text-sm" style={{ color: "var(--brief-error)" }}>
+                生成失败：{formatBriefApiErrorMessage(error)}
+              </p>
             </div>
           )}
 
@@ -256,10 +261,12 @@ export default function BriefPanel() {
                       type="button"
                       disabled={draftSaved || savingDraft}
                       onClick={handleSaveDraft}
-                      className="text-xs font-medium px-3 py-1.5 rounded-lg transition-opacity disabled:opacity-60 hover:opacity-90"
+                      className="rounded-[10px] px-3.5 py-2 text-[13px] font-medium transition-opacity disabled:opacity-60 hover:opacity-90"
                       style={{
-                        background: draftSaved ? "var(--border)" : "var(--brand)",
-                        color: draftSaved ? "var(--text-muted)" : "white",
+                        background: draftSaved ? "var(--surface-warm-sand)" : "var(--brand)",
+                        color: draftSaved ? "var(--text-muted)" : "#faf9f5",
+                        border: draftSaved ? "1px solid var(--border-strong)" : "none",
+                        boxShadow: draftSaved ? "inset 0 0 0 1px rgba(209,207,197,0.5)" : "0 0 0 1px rgba(201,100,66,0.35)",
                       }}
                     >
                       {savingDraft ? "保存中…" : draftSaved ? "已保存" : "保存到列表"}
@@ -269,8 +276,8 @@ export default function BriefPanel() {
               </div>
               {isLoading ? (
                 <div
-                  className="rounded-2xl p-5"
-                  style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
+                  className="brief-card-elevated rounded-2xl border p-5 md:p-6"
+                  style={{ background: "#ffffff", borderColor: "var(--border)" }}
                 >
                   <BriefMarkdownBody text={completion} />
                 </div>
@@ -278,8 +285,8 @@ export default function BriefPanel() {
                 <BriefLayout parsed={parsedCompletion} />
               ) : (
                 <div
-                  className="rounded-2xl p-5"
-                  style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
+                  className="brief-card-elevated rounded-2xl border p-5 md:p-6"
+                  style={{ background: "#ffffff", borderColor: "var(--border)" }}
                 >
                   <BriefMarkdownBody text={completion} />
                 </div>
@@ -291,9 +298,7 @@ export default function BriefPanel() {
 
       <section className="space-y-3" aria-label="已保存的简报">
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
-            已保存的简报
-          </h2>
+          <h2 className="brief-serif-heading text-base leading-snug">已保存的简报</h2>
           {saved.length > 0 && (
             <span className="text-xs" style={{ color: "var(--text-muted)" }}>
               最近 {saved.length} 条
@@ -303,10 +308,10 @@ export default function BriefPanel() {
 
         {saved.length === 0 ? (
           <div
-            className="rounded-2xl py-10 px-4 text-center text-sm"
+            className="rounded-2xl border-2 border-dashed py-10 px-4 text-center text-[15px] leading-relaxed"
             style={{
               background: "var(--surface-elevated)",
-              border: "2px dashed var(--border)",
+              borderColor: "var(--border-strong)",
               color: "var(--text-muted)",
             }}
           >
@@ -320,15 +325,15 @@ export default function BriefPanel() {
               return (
                 <li key={b.id}>
                   <div
-                    className="rounded-2xl overflow-hidden flex flex-col"
-                    style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
+                    className="brief-card-elevated flex flex-col overflow-hidden rounded-2xl border"
+                    style={{ background: "#ffffff", borderColor: "var(--border)" }}
                   >
                     <div
                       className="flex flex-wrap items-center gap-2 justify-between px-4 py-3 gap-y-2"
                       style={{ borderBottom: "1px solid var(--border)" }}
                     >
                       <div className="min-w-0">
-                        <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>
+                        <p className="brief-serif-heading truncate text-[15px]" style={{ color: "var(--text-primary)" }}>
                           {PERIOD_LABEL_CN[b.period_type]}
                         </p>
                         <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
@@ -340,10 +345,11 @@ export default function BriefPanel() {
                           type="button"
                           disabled={sendingId === b.id}
                           onClick={() => handleSendEmail(b.id)}
-                          className="text-xs font-medium px-3 py-1.5 rounded-lg transition-opacity disabled:opacity-50 hover:opacity-90"
+                          className="rounded-[10px] px-3 py-2 text-[12px] font-medium transition-opacity disabled:opacity-50 hover:opacity-90"
                           style={{
                             background: "var(--brand-subtle)",
                             color: "var(--brand)",
+                            boxShadow: "inset 0 0 0 1px rgba(201, 100, 66, 0.2)",
                           }}
                         >
                           {sendingId === b.id ? "发送中…" : "发邮件"}
@@ -352,10 +358,11 @@ export default function BriefPanel() {
                           type="button"
                           disabled={deletingId === b.id}
                           onClick={() => handleDelete(b.id)}
-                          className="text-xs font-medium px-3 py-1.5 rounded-lg transition-opacity disabled:opacity-50 hover:opacity-90"
+                          className="rounded-[10px] px-3 py-2 text-[12px] font-medium transition-opacity disabled:opacity-50 hover:opacity-90"
                           style={{
-                            background: "rgba(239,68,68,0.08)",
-                            color: "rgb(239 68 68)",
+                            background: "var(--brief-error-bg)",
+                            color: "var(--brief-error)",
+                            border: "1px solid var(--brief-error-border)",
                           }}
                         >
                           {deletingId === b.id ? "…" : "删除"}
@@ -389,8 +396,8 @@ export default function BriefPanel() {
       {showBigEmpty && (
         <div className="text-center py-8 -mt-2">
           <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3"
-            style={{ background: "var(--brand-subtle)" }}
+            className="flex h-14 w-14 items-center justify-center rounded-2xl mx-auto mb-3"
+            style={{ background: "var(--brand-subtle)", boxShadow: "inset 0 0 0 1px rgba(201, 100, 66, 0.15)" }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />

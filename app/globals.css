@@ -123,3 +123,56 @@ body {
 .fade-up {
   animation: fadeUp 0.3s ease forwards;
 }
+
+/* ── AI 简报 2.1：Claude-like 羊皮纸局部主题（Design doc: 「AI 简报 2.1.rtf」）── */
+.brief-skin-v21 {
+  --brand: #c96442;
+  --brand-dark: #a85435;
+  --brand-subtle: rgba(201, 100, 66, 0.14);
+
+  --text-primary: #141413;
+  --text-secondary: #5e5d59;
+  --text-muted: #87867f;
+
+  --surface: transparent;
+  --surface-elevated: #faf9f5;
+  --surface-warm-sand: #e8e6dc;
+
+  --border: #f0eee6;
+  --border-strong: #e8e6dc;
+
+  --brief-error: #b53333;
+  --brief-error-bg: rgba(181, 51, 51, 0.09);
+  --brief-error-border: rgba(181, 51, 51, 0.22);
+
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.brief-skin-v21 .brief-serif-heading {
+  font-family: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.brief-skin-v21 .brief-section-overline {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.brief-skin-v21 article h1,
+.brief-skin-v21 article h2,
+.brief-skin-v21 article h3 {
+  font-family: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.brief-skin-v21 .brief-card-elevated {
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 4px 24px;
+}
