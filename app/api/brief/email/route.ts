@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { resolveBriefRecipientEmail } from "@/lib/brief-recipient-email";
 import { PERIOD_LABEL_CN } from "@/lib/brief-period";
+import { normalizeResendFrom } from "@/lib/resend-from";
 import { Resend } from "resend";
 import type { PeriodType } from "@/types";
 
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
   const label = PERIOD_LABEL_CN[periodType] ?? "AI 简报";
   const subject = `[MomentLog] ${label}`;
 
-  const from = process.env.RESEND_FROM_EMAIL?.trim() || "MomentLog <onboarding@resend.dev>";
+  const from = normalizeResendFrom(process.env.RESEND_FROM_EMAIL);
 
   try {
     const { error: sendErr } = await resend.emails.send({
