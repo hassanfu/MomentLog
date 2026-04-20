@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { resolveBriefRecipientEmail } from "@/lib/brief-recipient-email";
 import { PERIOD_LABEL_CN } from "@/lib/brief-period";
 import { Resend } from "resend";
 import type { PeriodType } from "@/types";
@@ -18,8 +19,16 @@ export async function POST(req: Request) {
   } = await supabase.auth.getUser();
   if (!user) return Response.json({ error: "未登录" }, { status: 401 });
 
-  const to = user.email?.trim();
-  if (!to) return Response.json({ error: "账号未绑定邮箱，无法发送" }, { status: 400 });
+  const to = resolveBriefRecipientEmail(user);
+  if (!to) {
+    return Response.json(
+      {
+        error:
+          "当前账号没有可用于收件的邮箱（例如仅手机号登录）。请改用邮箱或 Google 登录 MomentLog，或在 Supabase 里为该用户补充邮箱后再试。",
+      },
+      { status: 400 },
+    );
+  }
 
   let body: { id?: string };
   try {

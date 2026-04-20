@@ -4,7 +4,7 @@
 
 export type BriefPeriod = "day" | "week" | "month" | "year";
 
-/** 概述标题中的时间段文案（替换 {{PERIOD}}） */
+/** 数据统计里的周期文案（如「本周」），不再用作小节标题 */
 export function periodOverviewTitle(period: BriefPeriod): string {
   switch (period) {
     case "day":
@@ -69,32 +69,29 @@ export function buildBriefPrompt(input: BuildBriefPromptInput): string {
 
   lines.push(`# 输出要求`);
   lines.push(`1. 使用 Markdown。**不要**加任何前言、后记、寒暄或总结套话（不要写「以上是简报」「希望对你有帮助」等）。`);
-  lines.push(`2. **第一段必须以三级标题开头**，标题文字必须一字不差（含空格）：`);
-  lines.push(`### ${periodWord} 概述`);
-  lines.push(`3. 在该标题下用无序列表写三行（数字与措辞）：`);
+  lines.push(`2. **正文必须以三级标题开头**，标题必须一字不差：`);
+  lines.push(`### 概述`);
+  lines.push(`3. 在「概述」标题下，先写无序列表 **三行**（数字须与下方统计一致）：`);
   lines.push(`   - 总记录条数：**${stats.activityCount}** 条`);
   lines.push(`   - 总花费时间：**${totalTimeStr}**（若很多活动未填时长，可在这一句里轻轻提一句，但条数与已汇总时长不得虚构）`);
   lines.push(`   - 最活跃的一天/领域：结合记录概括；若没有明显集中，可写「比较分散」或「差别不大」。`);
   if (stats.busiestDayLabel) lines.push(`     （参考：按条数/时长较突出的一天：${stats.busiestDayLabel}）`);
   if (stats.busiestDomainLabel) lines.push(`     （参考：标签侧较突出：${stats.busiestDomainLabel}）`);
-  lines.push(`4. 后续依次使用以下三级标题（**标题文字一字不差**）：`);
-  lines.push(`### 主要干了啥`);
-  lines.push(`### 随便说两句`);
-  lines.push(`### 小建议（可选）`);
+  lines.push(`4. **紧接列表之后**（仍在「概述」一节内，不要再加小标题），用 **一段话、只写一句** 轻松的观察（相当于以前的「随便说两句」里挑一句），语气口语、点到为止，不要编号列表。`);
+  lines.push(`5. 然后依次新增小节，三级标题必须一字不差：`);
+  lines.push(`### 核心`);
+  lines.push(`### 建议`);
   lines.push("");
   lines.push(`# 各节说明`);
-  lines.push(`### 主要干了啥`);
+  lines.push(`### 核心`);
   lines.push(
-    `- **今日简报、本周回顾**：尽量覆盖记录里的事，结合描述与标签，挑有特点的写，避免流水账；可穿插很轻的评论（如「看起来挺有挑战」「连续几天在做这个，挺拼的」）。`,
+    `- **今日 / 本周**：尽量覆盖记录里的事，结合描述与标签，挑有特点的写，避免流水账；可穿插很轻的评论（如「看起来挺有挑战」「连续几天在做这个，挺拼的」）。`,
   );
-  lines.push(`- **本月回顾、本年回顾**：不必写全，适当归纳主题与节奏即可。`);
+  lines.push(`- **本月 / 本年**：不必写全，适当归纳主题与节奏即可。`);
   lines.push("");
-  lines.push(`### 随便说两句`);
-  lines.push(`- 写 **1～3** 条从记录里提炼的观察，语气轻松，点到为止。`);
-  lines.push("");
-  lines.push(`### 小建议（可选）`);
-  lines.push(`- 若自然能想到，给 **1～2** 条很轻、很具体的小建议；`);
-  lines.push(`- 若没有，可只写一行「继续保持就好～」；或**整节省略**（含该标题也可以不出现）。`);
+  lines.push(`### 建议`);
+  lines.push(`- 若自然能想到，写 **1～2** 条很轻、很具体的小建议；`);
+  lines.push(`- 若没有，该小节可只写一行「继续保持就好～」，或**整节省略**（不出现 \`### 建议\` 标题也可以）。`);
   lines.push("");
   lines.push(`# 篇幅`);
   lines.push(`- **今日、本周**：全文约 **300～600 字**（中文）。`);
@@ -108,7 +105,7 @@ export function buildBriefPrompt(input: BuildBriefPromptInput): string {
   lines.push(`- 记录条数：**${stats.activityCount}**`);
   lines.push(`- 总时长（分钟，已加总）：**${Math.round(stats.totalMinutes)}** → 概述中写 **${totalTimeStr}**`);
   lines.push("");
-  lines.push(`## 活动明细（写「主要干了啥」时请引用，勿臆造）`);
+  lines.push(`## 活动明细（写「核心」时请引用，勿臆造）`);
 
   if (activities.length === 0) {
     lines.push("（本期无活动记录）");
@@ -124,7 +121,7 @@ export function buildBriefPrompt(input: BuildBriefPromptInput): string {
   }
 
   lines.push("");
-  lines.push(`请现在**直接输出**符合以上结构的 Markdown 正文（从 \`### ${periodWord} 概述\` 那一行开始，不要复述本说明）。`);
+  lines.push(`请现在**直接输出**符合以上结构的 Markdown 正文（从 \`### 概述\` 那一行开始，不要复述本说明）。`);
 
   return lines.join("\n");
 }

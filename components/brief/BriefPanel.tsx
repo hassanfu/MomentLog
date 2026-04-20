@@ -10,6 +10,8 @@ import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 import { listSavedBriefs, saveBriefMarkdown, deleteSavedBrief } from "@/lib/actions/saved-briefs";
 import { PERIOD_LABEL_CN } from "@/lib/brief-period";
+import { parseBriefMarkdown, shouldUseBriefLayout, stripOuterMarkdownFence } from "@/lib/brief-markdown-parse";
+import { BriefLayout } from "@/components/brief/BriefLayout";
 
 const PERIOD_OPTIONS: { value: PeriodType; label: string; emoji: string }[] = [
   { value: "day", label: "今日简报", emoji: "☀️" },
@@ -29,13 +31,6 @@ function formatBriefApiErrorMessage(err: Error): string {
     }
   }
   return m;
-}
-
-function stripOuterMarkdownFence(raw: string): string {
-  const t = raw.trim();
-  const m = t.match(/^```(?:markdown|md)?\s*\n?([\s\S]*?)```$/);
-  if (m) return m[1].trim();
-  return t;
 }
 
 function getPeriodDates(period: PeriodType): { start: string; end: string } {
@@ -174,6 +169,10 @@ export default function BriefPanel() {
 
   const showBigEmpty = !isLoading && !hasOutput && !error && saved.length === 0;
 
+  const parsedCompletion = completion ? parseBriefMarkdown(completion) : null;
+  const showParsedLayout =
+    Boolean(completion?.trim()) && !isLoading && parsedCompletion && shouldUseBriefLayout(parsedCompletion);
+
   return (
     <div className="space-y-8">
       <div>
@@ -268,12 +267,23 @@ export default function BriefPanel() {
                   )}
                 </div>
               </div>
-              <div
-                className="rounded-2xl p-5"
-                style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
-              >
-                <BriefMarkdownBody text={completion} />
-              </div>
+              {isLoading ? (
+                <div
+                  className="rounded-2xl p-5"
+                  style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
+                >
+                  <BriefMarkdownBody text={completion} />
+                </div>
+              ) : showParsedLayout && parsedCompletion ? (
+                <BriefLayout parsed={parsedCompletion} />
+              ) : (
+                <div
+                  className="rounded-2xl p-5"
+                  style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
+                >
+                  <BriefMarkdownBody text={completion} />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -304,66 +314,74 @@ export default function BriefPanel() {
           </div>
         ) : (
           <ul className="space-y-3">
-            {saved.map((b) => (
-              <li key={b.id}>
-                <div
-                  className="rounded-2xl overflow-hidden flex flex-col"
-                  style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
-                >
+            {saved.map((b) => {
+              const savedParsed = parseBriefMarkdown(b.body_markdown);
+              const useSavedLayout = Boolean(savedParsed && shouldUseBriefLayout(savedParsed));
+              return (
+                <li key={b.id}>
                   <div
-                    className="flex flex-wrap items-center gap-2 justify-between px-4 py-3 gap-y-2"
-                    style={{ borderBottom: "1px solid var(--border)" }}
+                    className="rounded-2xl overflow-hidden flex flex-col"
+                    style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
                   >
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>
-                        {PERIOD_LABEL_CN[b.period_type]}
-                      </p>
-                      <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-                        {format(new Date(b.created_at), "yyyy年M月d日 HH:mm", { locale: zhCN })}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        disabled={sendingId === b.id}
-                        onClick={() => handleSendEmail(b.id)}
-                        className="text-xs font-medium px-3 py-1.5 rounded-lg transition-opacity disabled:opacity-50 hover:opacity-90"
-                        style={{
-                          background: "var(--brand-subtle)",
-                          color: "var(--brand)",
-                        }}
-                      >
-                        {sendingId === b.id ? "发送中…" : "发邮件"}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={deletingId === b.id}
-                        onClick={() => handleDelete(b.id)}
-                        className="text-xs font-medium px-3 py-1.5 rounded-lg transition-opacity disabled:opacity-50 hover:opacity-90"
-                        style={{
-                          background: "rgba(239,68,68,0.08)",
-                          color: "rgb(239 68 68)",
-                        }}
-                      >
-                        {deletingId === b.id ? "…" : "删除"}
-                      </button>
-                    </div>
-                  </div>
-                  <details className="group">
-                    <summary
-                      className="px-4 py-2.5 cursor-pointer text-xs list-none flex items-center gap-2 [&::-webkit-details-marker]:hidden"
-                      style={{ color: "var(--text-secondary)" }}
+                    <div
+                      className="flex flex-wrap items-center gap-2 justify-between px-4 py-3 gap-y-2"
+                      style={{ borderBottom: "1px solid var(--border)" }}
                     >
-                      <span className="group-open:rotate-90 transition-transform inline-block">▸</span>
-                      展开 / 收起全文
-                    </summary>
-                    <div className="px-4 pb-4 pt-0 max-h-[min(70vh,480px)] overflow-y-auto">
-                      <BriefMarkdownBody text={b.body_markdown} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>
+                          {PERIOD_LABEL_CN[b.period_type]}
+                        </p>
+                        <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                          {format(new Date(b.created_at), "yyyy年M月d日 HH:mm", { locale: zhCN })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          disabled={sendingId === b.id}
+                          onClick={() => handleSendEmail(b.id)}
+                          className="text-xs font-medium px-3 py-1.5 rounded-lg transition-opacity disabled:opacity-50 hover:opacity-90"
+                          style={{
+                            background: "var(--brand-subtle)",
+                            color: "var(--brand)",
+                          }}
+                        >
+                          {sendingId === b.id ? "发送中…" : "发邮件"}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={deletingId === b.id}
+                          onClick={() => handleDelete(b.id)}
+                          className="text-xs font-medium px-3 py-1.5 rounded-lg transition-opacity disabled:opacity-50 hover:opacity-90"
+                          style={{
+                            background: "rgba(239,68,68,0.08)",
+                            color: "rgb(239 68 68)",
+                          }}
+                        >
+                          {deletingId === b.id ? "…" : "删除"}
+                        </button>
+                      </div>
                     </div>
-                  </details>
-                </div>
-              </li>
-            ))}
+                    <details className="group">
+                      <summary
+                        className="px-4 py-2.5 cursor-pointer text-xs list-none flex items-center gap-2 [&::-webkit-details-marker]:hidden"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        <span className="group-open:rotate-90 transition-transform inline-block">▸</span>
+                        展开 / 收起全文
+                      </summary>
+                      <div className="px-4 pb-4 pt-0 max-h-[min(70vh,480px)] overflow-y-auto">
+                        {useSavedLayout && savedParsed ? (
+                          <BriefLayout parsed={savedParsed} />
+                        ) : (
+                          <BriefMarkdownBody text={b.body_markdown} />
+                        )}
+                      </div>
+                    </details>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
