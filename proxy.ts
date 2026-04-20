@@ -1,12 +1,24 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { requireSupabasePublicEnv } from "@/lib/env-public";
 
 export async function proxy(request: NextRequest) {
+  let url: string;
+  let anonKey: string;
+  try {
+    ({ url, anonKey } = requireSupabasePublicEnv());
+  } catch {
+    return new NextResponse(
+      "MomentLog：未配置 Supabase 环境变量。请在 Vercel Project → Settings → Environment Variables 中添加 NEXT_PUBLIC_SUPABASE_URL 与 NEXT_PUBLIC_SUPABASE_ANON_KEY，并重新部署。",
+      { status: 500, headers: { "content-type": "text/plain; charset=utf-8" } },
+    );
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url,
+    anonKey,
     {
       cookies: {
         getAll() {
