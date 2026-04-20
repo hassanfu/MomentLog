@@ -75,45 +75,41 @@ export default function ActivityCard({ activity }: { activity: Activity }) {
           </button>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pr-12 md:pr-11">
-          <span className="text-xs tabular-nums md:text-[11px]" style={{ color: "var(--text-muted)" }}>
-            {timeStr}
-          </span>
-          {activity.duration_minutes ? (
-            <span
-              className="text-[11px] font-medium tabular-nums md:text-[10px]"
-              style={{ color: "var(--text-muted)" }}
-            >
-              {activity.duration_minutes >= 60
-                ? `${Math.floor(activity.duration_minutes / 60)}h${activity.duration_minutes % 60 > 0 ? ` ${activity.duration_minutes % 60}m` : ""}`
-                : `${activity.duration_minutes} 分钟`}
-            </span>
-          ) : null}
-        </div>
-
-        <p
-          className="mt-2 min-w-0 flex-1 text-base font-medium leading-snug md:text-sm"
-          style={{ color: "var(--text-primary)" }}
-        >
+        {/* 与「已保存的简报」卡片标题一致：衬线 + 15px */}
+        <p className="brief-serif-heading mt-0 min-w-0 flex-1 pr-12 text-[15px] leading-snug md:pr-11">
           {activity.description}
         </p>
 
-        {activity.tags.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {activity.tags.map((tag) => {
-              const color = TAG_COLORS[tag] ?? "var(--brand)";
-              return (
-                <span
-                  key={tag}
-                  className="rounded-md px-2 py-0.5 text-xs font-medium md:text-[11px]"
-                  style={{ background: `${color}18`, color }}
-                >
-                  {tag}
-                </span>
-              );
-            })}
-          </div>
-        )}
+        {/* 简报卡片时间样式 text-xs muted；时间与标签同一行 */}
+        <div className="mt-2 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-xs tabular-nums" style={{ color: "var(--text-muted)" }}>
+            {timeStr}
+          </span>
+          {activity.duration_minutes ? (
+            <>
+              <span className="select-none text-xs" style={{ color: "var(--text-muted)" }} aria-hidden>
+                ·
+              </span>
+              <span className="text-xs tabular-nums" style={{ color: "var(--text-muted)" }}>
+                {activity.duration_minutes >= 60
+                  ? `${Math.floor(activity.duration_minutes / 60)}h${activity.duration_minutes % 60 > 0 ? ` ${activity.duration_minutes % 60}m` : ""}`
+                  : `${activity.duration_minutes} 分钟`}
+              </span>
+            </>
+          ) : null}
+          {activity.tags.map((tag) => {
+            const color = TAG_COLORS[tag] ?? "var(--brand)";
+            return (
+              <span
+                key={tag}
+                className="rounded-md px-2 py-0.5 text-xs font-medium leading-none"
+                style={{ background: `${color}18`, color }}
+              >
+                {tag}
+              </span>
+            );
+          })}
+        </div>
       </div>
 
       <Dialog open={editing} onOpenChange={setEditing}>

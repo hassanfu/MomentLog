@@ -18,6 +18,7 @@ import {
 } from "@/lib/dashboard-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Hand } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /** 首次切入「时间线 / AI 简报」时才加载对应 chunk，减轻首屏 JS */
 function TabPanelFallback() {
@@ -112,7 +113,13 @@ export default function HomeDashboard({
               {userLabel}
             </p>
             {metrics && (
-              <div className="mt-2 flex flex-wrap gap-3 text-xs" style={{ color: "var(--text-muted)" }}>
+              <div
+                className={cn(
+                  "mt-2 flex flex-wrap gap-3 text-xs",
+                  tab !== "home" && "hidden lg:flex",
+                )}
+                style={{ color: "var(--text-muted)" }}
+              >
                 <span>
                   <strong className="font-semibold" style={{ color: "var(--text-secondary)" }}>
                     {metrics.totalRecords}
@@ -138,11 +145,13 @@ export default function HomeDashboard({
         </div>
 
         {heatmap && (
-          <ActivityHeatmap
-            cells={heatmap.cells}
-            numWeeks={heatmap.numWeeks}
-            gridStart={heatmap.gridStart}
-          />
+          <div className={cn(tab !== "home" && "hidden lg:block")}>
+            <ActivityHeatmap
+              cells={heatmap.cells}
+              numWeeks={heatmap.numWeeks}
+              gridStart={heatmap.gridStart}
+            />
+          </div>
         )}
 
         <nav className="hidden space-y-0.5 lg:block">

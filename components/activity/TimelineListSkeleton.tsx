@@ -22,19 +22,17 @@ export default function TimelineListSkeleton({ cards = 4 }: Props) {
             boxShadow: "var(--shadow-sm)",
           }}
         >
+          {/* 与 ActivityCard：正文在上、时间+标签在下同一行 */}
           <div
-            className="h-3 w-24 animate-pulse rounded"
+            className="h-[1.125rem] w-full max-w-[min(100%,18rem)] animate-pulse rounded"
             style={{ background: "var(--border)" }}
           />
           <div
-            className="mt-3 h-4 w-full max-w-[min(100%,20rem)] animate-pulse rounded"
+            className="mt-1.5 h-[1.125rem] w-[72%] max-w-[14rem] animate-pulse rounded"
             style={{ background: "var(--border)" }}
           />
-          <div
-            className="mt-2 h-4 w-[80%] max-w-[16rem] animate-pulse rounded"
-            style={{ background: "var(--border)" }}
-          />
-          <div className="mt-4 flex gap-2">
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <div className="h-3 w-10 animate-pulse rounded" style={{ background: "var(--border)" }} />
             <div className="h-5 w-14 animate-pulse rounded-md" style={{ background: "var(--border)" }} />
             <div className="h-5 w-12 animate-pulse rounded-md" style={{ background: "var(--border)" }} />
           </div>
