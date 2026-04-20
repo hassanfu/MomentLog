@@ -9,6 +9,7 @@ import ActivityTimeline from "@/components/activity/ActivityTimeline";
 import DashboardComposer from "@/components/dashboard/DashboardComposer";
 import TimelineExplorer from "@/components/activity/TimelineExplorer";
 import BriefPanel from "@/components/brief/BriefPanel";
+import { Hand } from "lucide-react";
 
 interface Props {
   heatmap: { cells: HeatmapCell[]; numWeeks: number; gridStart: string } | null;
@@ -139,10 +140,13 @@ export default function HomeDashboard({
                 {todayLabel}
               </p>
               <h1
-                className="mt-0.5 text-lg font-bold tracking-tight sm:text-xl"
+                className="mt-0.5 flex flex-wrap items-center gap-2 text-lg tracking-tight sm:text-xl"
                 style={{ color: "var(--text-primary)", letterSpacing: "-0.5px" }}
               >
-                {greeting}，{userLabel} 👋
+                <span>
+                  {greeting}，{userLabel}
+                </span>
+                <Hand className="h-5 w-5 shrink-0" strokeWidth={2} style={{ color: "var(--brand)" }} aria-hidden />
               </h1>
             </div>
 
@@ -150,7 +154,7 @@ export default function HomeDashboard({
 
             <div>
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>
+                <h2 className="text-sm" style={{ color: "var(--text-secondary)" }}>
                   最近动态
                 </h2>
                 <button

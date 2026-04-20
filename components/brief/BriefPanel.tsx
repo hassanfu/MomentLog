@@ -12,12 +12,21 @@ import { listSavedBriefs, saveBriefMarkdown, deleteSavedBrief } from "@/lib/acti
 import { PERIOD_LABEL_CN } from "@/lib/brief-period";
 import { parseBriefMarkdown, shouldUseBriefLayout, stripOuterMarkdownFence } from "@/lib/brief-markdown-parse";
 import { BriefLayout } from "@/components/brief/BriefLayout";
+import type { LucideIcon } from "lucide-react";
+import {
+  CalendarDays,
+  CalendarRange,
+  ChevronRight,
+  Loader2,
+  Sparkles,
+  Sun,
+} from "lucide-react";
 
-const PERIOD_OPTIONS: { value: PeriodType; label: string; emoji: string }[] = [
-  { value: "day", label: "今日简报", emoji: "☀️" },
-  { value: "week", label: "本周回顾", emoji: "📅" },
-  { value: "month", label: "本月回顾", emoji: "🗓️" },
-  { value: "year", label: "本年回顾", emoji: "✨" },
+const PERIOD_OPTIONS: { value: PeriodType; label: string; Icon: LucideIcon }[] = [
+  { value: "day", label: "今日简报", Icon: Sun },
+  { value: "week", label: "本周回顾", Icon: CalendarDays },
+  { value: "month", label: "本月回顾", Icon: CalendarRange },
+  { value: "year", label: "本年回顾", Icon: Sparkles },
 ];
 
 function formatBriefApiErrorMessage(err: Error): string {
@@ -183,7 +192,7 @@ export default function BriefPanel() {
       </div>
 
       <div className="grid grid-cols-2 gap-2.5">
-        {PERIOD_OPTIONS.map(({ value, label, emoji }) => (
+        {PERIOD_OPTIONS.map(({ value, label, Icon }) => (
           <button
             key={value}
             type="button"
@@ -197,14 +206,21 @@ export default function BriefPanel() {
               boxShadow: activeStyle(value) ? "none" : "0 0 0 1px rgba(209, 207, 197, 0.45)",
             }}
           >
-            <span className="text-base">{emoji}</span>
+            <Icon
+              className="h-4 w-4 shrink-0"
+              strokeWidth={2}
+              aria-hidden
+              style={{ color: activeStyle(value) ? "#faf9f5" : "var(--brand)" }}
+            />
             <span>{label}</span>
             {isLoading && period === value && (
               <span className="ml-auto">
-                <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="rgba(250,249,245,0.35)" strokeWidth="3" />
-                  <path d="M12 2a10 10 0 0 1 10 10" stroke="#faf9f5" strokeWidth="3" strokeLinecap="round" />
-                </svg>
+                <Loader2
+                  className="h-3.5 w-3.5 animate-spin"
+                  strokeWidth={2}
+                  style={{ color: "#faf9f5" }}
+                  aria-hidden
+                />
               </span>
             )}
           </button>
@@ -219,10 +235,7 @@ export default function BriefPanel() {
               className="brief-card-elevated flex items-center gap-3 rounded-2xl border p-6"
               style={{ background: "var(--surface-elevated)", borderColor: "var(--border)" }}
             >
-              <svg className="animate-spin shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="var(--brand)" strokeOpacity="0.25" strokeWidth="3" />
-                <path d="M12 2a10 10 0 0 1 10 10" stroke="var(--brand)" strokeWidth="3" strokeLinecap="round" />
-              </svg>
+              <Loader2 className="h-5 w-5 shrink-0 animate-spin" strokeWidth={2} style={{ color: "var(--brand)" }} aria-hidden />
               <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
                 正在连接 AI 并生成简报…
               </span>
@@ -246,7 +259,7 @@ export default function BriefPanel() {
                 <div className="flex items-center gap-2">
                   {isLoading && (
                     <span className="text-xs inline-flex items-center gap-1.5" style={{ color: "var(--brand)" }}>
-                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--brand)" }} />
+                      <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" strokeWidth={2} aria-hidden />
                       生成中…
                     </span>
                   )}
@@ -368,7 +381,11 @@ export default function BriefPanel() {
                         className="px-4 py-2.5 cursor-pointer text-xs list-none flex items-center gap-2 [&::-webkit-details-marker]:hidden"
                         style={{ color: "var(--text-secondary)" }}
                       >
-                        <span className="group-open:rotate-90 transition-transform inline-block">▸</span>
+                        <ChevronRight
+                          className="h-4 w-4 shrink-0 transition-transform group-open:rotate-90"
+                          strokeWidth={2}
+                          aria-hidden
+                        />
                         展开 / 收起全文
                       </summary>
                       <div className="px-4 pb-4 pt-0 max-h-[min(70vh,480px)] overflow-y-auto">
@@ -393,9 +410,7 @@ export default function BriefPanel() {
             className="flex h-14 w-14 items-center justify-center rounded-2xl mx-auto mb-3"
             style={{ background: "var(--brand-subtle)", boxShadow: "inset 0 0 0 1px rgba(201, 100, 66, 0.15)" }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
-            </svg>
+            <Sparkles className="h-6 w-6" strokeWidth={2} style={{ color: "var(--brand)" }} aria-hidden />
           </div>
           <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
             点击上方卡片开始

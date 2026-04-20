@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Pencil, Trash2 } from "lucide-react";
 
 const TAG_COLORS: Record<string, string> = {
   "#工作": "#c96442",
@@ -96,16 +97,18 @@ export default function ActivityCard({ activity }: { activity: Activity }) {
               onClick={() => setEditing(true)}
               className="p-1.5 rounded-lg transition-all hover:opacity-70"
               style={{ color: "var(--text-muted)" }}
+              aria-label="编辑"
             >
-              <EditIcon />
+              <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
             </button>
             <button
               onClick={handleDelete}
               disabled={isPending}
               className="p-1.5 rounded-lg transition-all hover:opacity-70 disabled:opacity-30"
               style={{ color: "#ef4444" }}
+              aria-label="删除"
             >
-              <TrashIcon />
+              <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
             </button>
           </div>
         </div>
@@ -120,21 +123,5 @@ export default function ActivityCard({ activity }: { activity: Activity }) {
         </DialogContent>
       </Dialog>
     </>
-  );
-}
-
-function EditIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-    </svg>
-  );
-}
-function TrashIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-    </svg>
   );
 }

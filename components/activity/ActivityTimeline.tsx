@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import type { Activity } from "@/types";
 import ActivityCard from "./ActivityCard";
+import { Plus } from "lucide-react";
 
 interface Props {
   activities: Activity[];
@@ -15,9 +16,7 @@ export default function ActivityTimeline({ activities }: Props) {
           className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
           style={{ background: "var(--brand-subtle)" }}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
+          <Plus className="h-6 w-6" strokeWidth={2} style={{ color: "var(--brand)" }} aria-hidden />
         </div>
         <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
           这里还没有记录

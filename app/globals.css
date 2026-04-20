@@ -137,13 +137,19 @@ body {
   animation: fadeUp 0.3s ease forwards;
 }
 
-/* 简报模块排版工具类（令牌已由 :root / .dark 全局提供） */
-.brief-serif-heading {
+/* 全站标题：与「AI 简报」主标题一致衬线（CardTitle / DialogTitle 使用 .font-heading） */
+h1,
+h2,
+h3,
+.brief-serif-heading,
+.font-heading {
   font-family: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
   font-weight: 500;
   letter-spacing: -0.03em;
   color: var(--text-primary);
 }
+
+/* 简报模块其余排版（令牌已由 :root / .dark 全局提供） */
 
 .brief-section-overline {
   font-size: 0.6875rem;

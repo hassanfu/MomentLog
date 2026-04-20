@@ -93,7 +93,7 @@ export default function StatsCharts({ today, week, month }: DashboardStatsProps)
           className="rounded-2xl p-4"
           style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
         >
-          <h3 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "var(--text-muted)" }}>
+          <h3 className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "var(--text-muted)" }}>
             本周每日记录数
           </h3>
           <ResponsiveContainer width="100%" height={100}>
@@ -121,7 +121,7 @@ export default function StatsCharts({ today, week, month }: DashboardStatsProps)
           className="rounded-2xl p-4"
           style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
         >
-          <h3 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "var(--text-muted)" }}>
+          <h3 className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "var(--text-muted)" }}>
             本周标签分布
           </h3>
           <div className="space-y-2.5">

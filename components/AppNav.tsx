@@ -6,6 +6,7 @@ import { signOut } from "@/lib/actions/auth";
 import type { User } from "@supabase/supabase-js";
 import { useTransition } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Layers, User as UserIcon } from "lucide-react";
 
 export default function AppNav({ user }: { user: User }) {
   const router = useRouter();
@@ -33,9 +34,7 @@ export default function AppNav({ user }: { user: User }) {
               className="flex h-7 w-7 items-center justify-center rounded-lg"
               style={{ background: "var(--brand)" }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <Layers className="h-3.5 w-3.5 text-white" strokeWidth={2} aria-hidden />
             </div>
             <span className="text-sm font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
               MomentLog
@@ -82,7 +81,7 @@ export default function AppNav({ user }: { user: User }) {
           className="flex w-full flex-col items-center gap-0.5 py-3 transition-opacity hover:opacity-80 disabled:opacity-50"
           style={{ color: "var(--text-muted)" }}
         >
-          <UserIcon size={20} />
+          <UserIcon className="h-5 w-5" strokeWidth={2} aria-hidden />
           <span className="text-[10px] font-medium">{pending ? "…" : "退出"}</span>
         </button>
       </nav>
@@ -90,10 +89,3 @@ export default function AppNav({ user }: { user: User }) {
   );
 }
 
-function UserIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-    </svg>
-  );
-}

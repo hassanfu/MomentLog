@@ -8,6 +8,7 @@ import {
   signUpWithEmailClient,
   signInWithGoogleClient,
 } from "@/lib/auth-browser";
+import { Layers } from "lucide-react";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -69,11 +70,9 @@ export default function LoginPage() {
             className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4"
             style={{ background: "var(--brand)", boxShadow: "0 8px 24px rgba(201,100,66,0.32)" }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <Layers className="h-6 w-6 text-white" strokeWidth={2} aria-hidden />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight" style={{ color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
+          <h1 className="text-2xl tracking-tight" style={{ color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
             MomentLog
           </h1>
           <p className="mt-1 text-sm" style={{ color: "var(--text-muted)" }}>
@@ -85,7 +84,7 @@ export default function LoginPage() {
           className="rounded-2xl p-6 space-y-4"
           style={{ background: "var(--surface-elevated)", boxShadow: "var(--shadow-sm)", border: "1px solid var(--border)" }}
         >
-          <h2 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
+          <h2 className="text-base" style={{ color: "var(--text-primary)" }}>
             {mode === "signin" ? "登录账户" : "创建账户"}
           </h2>
 

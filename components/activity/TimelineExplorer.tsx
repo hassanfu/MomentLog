@@ -16,6 +16,7 @@ import {
   endOfWeek,
 } from "date-fns";
 import { zhCN } from "date-fns/locale";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const PERIODS: { value: PeriodType; label: string }[] = [
   { value: "day", label: "日" },
@@ -80,7 +81,7 @@ export default function TimelineExplorer() {
 
   return (
     <div className="space-y-5">
-      <h2 className="text-lg font-bold tracking-tight" style={{ color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
+      <h2 className="text-lg tracking-tight" style={{ color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
         时间线
       </h2>
 
@@ -115,9 +116,7 @@ export default function TimelineExplorer() {
           style={{ color: "var(--text-secondary)" }}
           aria-label="上一段"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
+          <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden />
         </button>
         <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
           {getPeriodLabel()}
@@ -130,9 +129,7 @@ export default function TimelineExplorer() {
           style={{ color: "var(--text-secondary)" }}
           aria-label="下一段"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 18l6-6-6-6" />
-          </svg>
+          <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden />
         </button>
       </div>
 
