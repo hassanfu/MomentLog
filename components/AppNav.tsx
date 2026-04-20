@@ -47,7 +47,7 @@ export default function AppNav({ user }: { user: User }) {
               type="button"
               onClick={handleSignOut}
               disabled={pending}
-              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all hover:opacity-80 disabled:opacity-50"
+              className="flex h-9 shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-medium transition-all hover:opacity-80 disabled:opacity-50"
               style={{ color: "var(--text-muted)", background: "var(--brand-subtle)" }}
             >
               <span

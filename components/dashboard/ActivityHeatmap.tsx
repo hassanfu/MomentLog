@@ -4,6 +4,10 @@ import { addDays, format, parseISO } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import type { HeatmapCell } from "@/types";
 
+const CELL_PX = 11;
+/** 方块之间横向、纵向统一间距（像素） */
+const GAP_PX = 4;
+
 const LEVEL_BG: Record<HeatmapCell["level"], string> = {
   0: "var(--heatmap-0)",
   1: "var(--heatmap-1)",
@@ -30,32 +34,46 @@ export default function ActivityHeatmap({ cells, numWeeks, gridStart }: Props) {
       <div className="overflow-x-auto pb-1">
         <div className="inline-flex min-w-full flex-col gap-1.5">
           <div
-            className="inline-grid gap-[3px]"
+            className="inline-grid"
             style={{
-              gridTemplateRows: "repeat(7, 11px)",
+              gridTemplateColumns: `repeat(${numWeeks}, ${CELL_PX}px)`,
+              gridTemplateRows: `repeat(7, ${CELL_PX}px)`,
               gridAutoFlow: "column",
+              rowGap: GAP_PX,
+              columnGap: GAP_PX,
             }}
           >
             {cells.map((cell) => (
               <div
                 key={cell.date}
                 title={`${cell.date} · ${cell.count} 条记录`}
-                className="w-[11px] shrink-0 rounded-[2px] transition-colors"
-                style={{ background: LEVEL_BG[cell.level] }}
+                className="shrink-0 rounded-[2px] transition-colors"
+                style={{
+                  width: CELL_PX,
+                  height: CELL_PX,
+                  background: LEVEL_BG[cell.level],
+                }}
               />
             ))}
           </div>
           <div
-            className="grid gap-[3px]"
-            style={{ gridTemplateColumns: `repeat(${numWeeks}, 11px)` }}
+            className="grid"
+            style={{
+              gridTemplateColumns: `repeat(${numWeeks}, ${CELL_PX}px)`,
+              columnGap: GAP_PX,
+            }}
           >
             {monthLabels.map((m, i) => (
               <span
                 key={i}
-                className="text-[9px] leading-none"
-                style={{ color: m ? "var(--text-muted)" : "transparent" }}
+                className="text-[9px] leading-none whitespace-nowrap overflow-visible block"
+                style={{
+                  color: m ? "var(--text-muted)" : "transparent",
+                  width: CELL_PX,
+                  minWidth: CELL_PX,
+                }}
               >
-                {m || "·"}
+                {m || "\u00a0"}
               </span>
             ))}
           </div>
