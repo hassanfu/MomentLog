@@ -1,73 +1,130 @@
-import { Activity, PeriodType } from "@/types";
-import { format } from "date-fns";
-import { zhCN } from "date-fns/locale";
+/**
+ * AI 简报系统提示：输出固定 Markdown 结构，语气温暖专业、基于事实、不过度解读。
+ */
 
-export function buildBriefPrompt(
-  activities: Activity[],
-  period: PeriodType,
-  periodStart: string,
-  periodEnd: string
-): string {
-  const periodLabels: Record<PeriodType, string> = {
-    day: "今日",
-    week: "本周",
-    month: "本月",
-    year: "今年",
-  };
+export type BriefPeriod = "day" | "week" | "month" | "year";
 
-  const totalMinutes = activities.reduce((sum, a) => sum + (a.duration_minutes ?? 0), 0);
-  const hours = Math.floor(totalMinutes / 60);
-  const mins = totalMinutes % 60;
+/** 概述标题中的时间段文案（替换 {{PERIOD}}） */
+export function periodOverviewTitle(period: BriefPeriod): string {
+  switch (period) {
+    case "day":
+      return "今日";
+    case "week":
+      return "本周";
+    case "month":
+      return "本月";
+    case "year":
+      return "本年";
+    default:
+      return "本期";
+  }
+}
 
-  const tagSummary: Record<string, { count: number; minutes: number }> = {};
-  for (const activity of activities) {
-    for (const tag of activity.tags) {
-      if (!tagSummary[tag]) tagSummary[tag] = { count: 0, minutes: 0 };
-      tagSummary[tag].count++;
-      tagSummary[tag].minutes += activity.duration_minutes ?? 0;
+export type BriefActivityRow = {
+  title: string;
+  note?: string | null;
+  tags?: string[];
+  durationMinutes?: number | null;
+};
+
+export type BriefPromptStats = {
+  activityCount: number;
+  totalMinutes: number;
+  busiestDayLabel?: string | null;
+  busiestDomainLabel?: string | null;
+};
+
+export type BuildBriefPromptInput = {
+  period: BriefPeriod;
+  dateRangeLabel: string;
+  stats: BriefPromptStats;
+  activities: BriefActivityRow[];
+};
+
+function formatDurationChinese(totalMinutes: number): string {
+  if (!totalMinutes || totalMinutes <= 0) return "约 0 小时";
+  const hours = Math.round((totalMinutes / 60) * 10) / 10;
+  if (hours >= 1) return `约 ${hours} 小时`;
+  const m = Math.round(totalMinutes);
+  return `约 ${m} 分钟`;
+}
+
+/**
+ * 构建简报生成用的用户消息全文（交给模型执行：直接输出 Markdown 正文）。
+ */
+export function buildBriefPrompt(input: BuildBriefPromptInput): string {
+  const { period, dateRangeLabel, stats, activities } = input;
+  const periodWord = periodOverviewTitle(period);
+  const totalTimeStr = formatDurationChinese(stats.totalMinutes);
+
+  const lines: string[] = [];
+
+  lines.push(`# 角色与原则`);
+  lines.push(
+    `你是用户的私人生活教练兼生产力助手：温暖、专业、有洞察力。只根据下方「数据统计」与「活动明细」写作，不得编造记录里不存在的事实、标签或时长。`,
+  );
+  lines.push(`语气像一位懂你的朋友：自然、口语化，多用「你这段时间……」「感觉你……」。重点是「发生了什么」和「感觉怎么样」。`);
+  lines.push(`观察与见解要适量：只写从记录里明显能看出的点；没有就别硬凑。优先写积极或有趣的一面；若明显有连续熬夜、压力过大等，可温和提一句，不要说教。`);
+  lines.push("");
+
+  lines.push(`# 输出要求`);
+  lines.push(`1. 使用 Markdown。**不要**加任何前言、后记、寒暄或总结套话（不要写「以上是简报」「希望对你有帮助」等）。`);
+  lines.push(`2. **第一段必须以三级标题开头**，标题文字必须一字不差（含空格）：`);
+  lines.push(`### ${periodWord} 概述`);
+  lines.push(`3. 在该标题下用无序列表写三行（数字与措辞）：`);
+  lines.push(`   - 总记录条数：**${stats.activityCount}** 条`);
+  lines.push(`   - 总花费时间：**${totalTimeStr}**（若很多活动未填时长，可在这一句里轻轻提一句，但条数与已汇总时长不得虚构）`);
+  lines.push(`   - 最活跃的一天/领域：结合记录概括；若没有明显集中，可写「比较分散」或「差别不大」。`);
+  if (stats.busiestDayLabel) lines.push(`     （参考：按条数/时长较突出的一天：${stats.busiestDayLabel}）`);
+  if (stats.busiestDomainLabel) lines.push(`     （参考：标签侧较突出：${stats.busiestDomainLabel}）`);
+  lines.push(`4. 后续依次使用以下三级标题（**标题文字一字不差**）：`);
+  lines.push(`### 主要干了啥`);
+  lines.push(`### 随便说两句`);
+  lines.push(`### 小建议（可选）`);
+  lines.push("");
+  lines.push(`# 各节说明`);
+  lines.push(`### 主要干了啥`);
+  lines.push(
+    `- **今日简报、本周回顾**：尽量覆盖记录里的事，结合描述与标签，挑有特点的写，避免流水账；可穿插很轻的评论（如「看起来挺有挑战」「连续几天在做这个，挺拼的」）。`,
+  );
+  lines.push(`- **本月回顾、本年回顾**：不必写全，适当归纳主题与节奏即可。`);
+  lines.push("");
+  lines.push(`### 随便说两句`);
+  lines.push(`- 写 **1～3** 条从记录里提炼的观察，语气轻松，点到为止。`);
+  lines.push("");
+  lines.push(`### 小建议（可选）`);
+  lines.push(`- 若自然能想到，给 **1～2** 条很轻、很具体的小建议；`);
+  lines.push(`- 若没有，可只写一行「继续保持就好～」；或**整节省略**（含该标题也可以不出现）。`);
+  lines.push("");
+  lines.push(`# 篇幅`);
+  lines.push(`- **今日、本周**：全文约 **300～600 字**（中文）。`);
+  lines.push(`- **本月、本年**：可略长，仍要简洁好读。`);
+  lines.push(`- 若活动很少，诚实说「这次记录不多」，但仍从现有内容里找积极或有趣的点。`);
+  lines.push("");
+  lines.push(`---`);
+  lines.push(`## 数据统计（权威；概述中的条数与总时长须与此一致）`);
+  lines.push(`- 周期：**${periodWord}**`);
+  lines.push(`- 日期范围：**${dateRangeLabel}**`);
+  lines.push(`- 记录条数：**${stats.activityCount}**`);
+  lines.push(`- 总时长（分钟，已加总）：**${Math.round(stats.totalMinutes)}** → 概述中写 **${totalTimeStr}**`);
+  lines.push("");
+  lines.push(`## 活动明细（写「主要干了啥」时请引用，勿臆造）`);
+
+  if (activities.length === 0) {
+    lines.push("（本期无活动记录）");
+  } else {
+    for (let i = 0; i < activities.length; i++) {
+      const a = activities[i];
+      const tags = a.tags?.length ? a.tags.join("、") : "无";
+      const dur =
+        a.durationMinutes != null && a.durationMinutes > 0 ? `${Math.round(a.durationMinutes)} 分钟` : "未填";
+      const note = a.note?.trim() ? `；备注：${a.note.trim()}` : "";
+      lines.push(`${i + 1}. **${a.title}**｜标签：${tags}｜时长：${dur}${note}`);
     }
   }
 
-  const tagBreakdown = Object.entries(tagSummary)
-    .map(([tag, { count, minutes }]) => `${tag}: ${count}条记录, ${minutes}分钟`)
-    .join("\n");
+  lines.push("");
+  lines.push(`请现在**直接输出**符合以上结构的 Markdown 正文（从 \`### ${periodWord} 概述\` 那一行开始，不要复述本说明）。`);
 
-  const activityList = activities
-    .map((a) => {
-      const dateStr = format(new Date(a.date), "M月d日", { locale: zhCN });
-      const tags = a.tags.join(" ");
-      const dur = a.duration_minutes ? `(${a.duration_minutes}分钟)` : "";
-      return `- [${dateStr}] ${a.description} ${tags} ${dur}`;
-    })
-    .join("\n");
-
-  return `你是一位温暖、专业、富有洞察力的个人成长教练。请根据以下活动记录，为用户生成一份${periodLabels[period]}简报。
-
-**时间段**: ${periodStart} 至 ${periodEnd}
-**总记录条数**: ${activities.length} 条
-**总时长**: ${hours > 0 ? `${hours}小时` : ""}${mins > 0 ? `${mins}分钟` : "（未记录时长）"}
-
-**标签分布**:
-${tagBreakdown || "（无标签数据）"}
-
-**活动记录**:
-${activityList || "（本时段无记录）"}
-
-请以 JSON 格式输出，结构如下：
-{
-  "title": "简报标题（简洁有力，如"专注深耕的一周"）",
-  "summary": "2-3段自然语言总结，温暖专业，带个人洞察，使用第二人称（"你"）",
-  "keyEvents": ["关键事件1", "关键事件2", "关键事件3"（最多5条）],
-  "timeAllocation": [
-    { "category": "标签名", "minutes": 数字, "percentage": 百分比数字（0-100）}
-  ],
-  "insights": ["洞察1", "洞察2", "洞察3"（最多3条，可操作的改进建议）],
-  "encouragement": "一句温暖有力的结语"
-}
-
-要求：
-- 风格：温暖、专业、像一位好友兼教练
-- 如有具体数字（小时数、次数），请引用
-- 洞察要基于数据，具体可行，不空泛
-- 只输出 JSON，不要有其他文字`;
+  return lines.join("\n");
 }

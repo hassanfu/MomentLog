@@ -2,10 +2,14 @@ import { streamText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { getErrorMessage } from "@ai-sdk/provider";
 import { createClient } from "@/lib/supabase/server";
-import { buildBriefPrompt } from "@/lib/prompts";
 import { getActivities } from "@/lib/actions/activities";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfDay, endOfDay } from "date-fns";
-import type { PeriodType } from "@/types";
+import { getPeriodBounds } from "@/lib/brief-period";
+import { computeBriefPromptStats } from "@/lib/brief-stats";
+import type { BriefActivityRow, BriefPeriod } from "@/lib/prompts";
+import { buildBriefPrompt } from "@/lib/prompts";
+import { format } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import type { Activity, PeriodType } from "@/types";
 
 /** Vercel / 长耗时流式响应 */
 export const maxDuration = 120;
@@ -77,6 +81,15 @@ function hydrateDeepSeekApiKeyFromDisk() {
   }
 }
 
+function formatBriefDateRangeLabel(periodStart: string, periodEnd: string): string {
+  const s = new Date(periodStart + "T12:00:00");
+  const e = new Date(periodEnd + "T12:00:00");
+  if (periodStart === periodEnd) {
+    return format(s, "yyyy年M月d日", { locale: zhCN });
+  }
+  return `${format(s, "yyyy年M月d日", { locale: zhCN })} — ${format(e, "yyyy年M月d日", { locale: zhCN })}`;
+}
+
 export async function POST(req: Request) {
   hydrateDeepSeekApiKeyFromDisk();
 
@@ -103,31 +116,23 @@ export async function POST(req: Request) {
 
   const { period, referenceDate } = (await req.json()) as { period: PeriodType; referenceDate: string };
 
-  const ref = new Date(referenceDate + "T00:00:00");
-  let periodStart: string;
-  let periodEnd: string;
+  const { periodStart, periodEnd } = getPeriodBounds(referenceDate, period);
 
-  switch (period) {
-    case "week":
-      periodStart = format(startOfWeek(ref, { weekStartsOn: 1 }), "yyyy-MM-dd");
-      periodEnd = format(endOfWeek(ref, { weekStartsOn: 1 }), "yyyy-MM-dd");
-      break;
-    case "month":
-      periodStart = format(startOfMonth(ref), "yyyy-MM-dd");
-      periodEnd = format(endOfMonth(ref), "yyyy-MM-dd");
-      break;
-    case "year":
-      periodStart = format(startOfYear(ref), "yyyy-MM-dd");
-      periodEnd = format(endOfYear(ref), "yyyy-MM-dd");
-      break;
-    default:
-      periodStart = format(startOfDay(ref), "yyyy-MM-dd");
-      periodEnd = format(endOfDay(ref), "yyyy-MM-dd");
-  }
+  const activities = (await getActivities(period, referenceDate)) as Activity[];
 
-  const activities = await getActivities(period, referenceDate);
+  const stats = computeBriefPromptStats(activities);
+  const rows: BriefActivityRow[] = activities.map((a) => ({
+    title: (a.description ?? "").trim() || "（无描述）",
+    tags: a.tags as string[],
+    durationMinutes: a.duration_minutes,
+  }));
 
-  const prompt = buildBriefPrompt(activities, period, periodStart, periodEnd);
+  const prompt = buildBriefPrompt({
+    period: period as BriefPeriod,
+    dateRangeLabel: formatBriefDateRangeLabel(periodStart, periodEnd),
+    stats,
+    activities: rows,
+  });
 
   try {
     const result = streamText({
@@ -135,7 +140,7 @@ export async function POST(req: Request) {
       model: deepseek.chat("deepseek-chat"),
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
-      maxOutputTokens: 2000,
+      maxOutputTokens: 3500,
     });
 
     return result.toUIMessageStreamResponse({

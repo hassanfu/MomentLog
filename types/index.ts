@@ -52,3 +52,15 @@ export interface Brief {
   content: BriefContent | null;
   created_at: string;
 }
+
+/** `saved_briefs` 表：Markdown 简报存档 */
+export interface SavedBrief {
+  id: string;
+  user_id: string;
+  period_type: PeriodType;
+  reference_date: string;
+  period_start: string;
+  period_end: string;
+  body_markdown: string;
+  created_at: string;
+}
