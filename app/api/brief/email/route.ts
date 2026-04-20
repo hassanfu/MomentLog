@@ -13,6 +13,20 @@ function getResend() {
   return new Resend(key);
 }
 
+/** 将 Resend 常见英文错误转写为可理解的说明 */
+function formatResendErrorForUser(message: string): string {
+  const m = message.toLowerCase();
+  if (m.includes("only send testing emails") || m.includes("verify a domain at resend.com")) {
+    return [
+      "当前为 Resend 测试环境：用默认/未验证域发信时，收件人只能是你 Resend 账号里登记的那封邮箱。",
+      "解决方式二选一：",
+      "1）在 MomentLog 用与 Resend 相同的那封邮箱登录，再发邮件；",
+      "2）在 resend.com/domains 添加并验证自己的域名，把发件人 RESEND_FROM_EMAIL 改为该域名下地址，即可发到你在 App 里的登录邮箱。",
+    ].join("");
+  }
+  return message;
+}
+
 export async function POST(req: Request) {
   const supabase = await createClient();
   const {
@@ -73,16 +87,17 @@ export async function POST(req: Request) {
 
     if (sendErr) {
       console.error("[api/brief/email]", sendErr);
-      const msg =
+      const raw =
         sendErr && typeof sendErr === "object" && "message" in sendErr
           ? String((sendErr as { message: string }).message)
           : "发送失败";
-      return Response.json({ error: msg }, { status: 502 });
+      return Response.json({ error: formatResendErrorForUser(raw) }, { status: 502 });
     }
 
     return Response.json({ ok: true });
   } catch (e) {
     console.error("[api/brief/email]", e);
-    return Response.json({ error: e instanceof Error ? e.message : "发送失败" }, { status: 502 });
+    const raw = e instanceof Error ? e.message : "发送失败";
+    return Response.json({ error: formatResendErrorForUser(raw) }, { status: 502 });
   }
 }
