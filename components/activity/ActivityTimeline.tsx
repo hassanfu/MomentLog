@@ -79,24 +79,11 @@ export default function ActivityTimeline({ activities }: Props) {
               </span>
             </div>
 
-            {/* 左侧竖线 + 条目（加密快讯式时间轴） */}
-            <div className="relative">
-              {/* 贯穿当日的竖线，与节点圆点中心对齐（w-7 → 圆心约 14px） */}
-              <div
-                className="pointer-events-none absolute top-3 bottom-4 left-[13px] z-0 w-px md:left-[15px]"
-                style={{ background: "var(--border-strong)" }}
-                aria-hidden
-              />
-
-              <div className="relative z-[1]">
-                {dayActivities.map((activity, index) => (
-                  <ActivityCard
-                    key={activity.id}
-                    activity={activity}
-                    isLastInDay={index === dayActivities.length - 1}
-                  />
-                ))}
-              </div>
+            {/* 移动端单列，md+ 两列卡片 */}
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+              {dayActivities.map((activity) => (
+                <ActivityCard key={activity.id} activity={activity} />
+              ))}
             </div>
           </div>
         );

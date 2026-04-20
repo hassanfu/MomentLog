@@ -135,7 +135,7 @@ export default function TimelineExplorer() {
       </div>
 
       {isLoading ? (
-        <TimelineListSkeleton rows={4} />
+        <TimelineListSkeleton cards={4} />
       ) : (
         <ActivityTimeline activities={activities} />
       )}

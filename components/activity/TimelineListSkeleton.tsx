@@ -1,50 +1,45 @@
-/** 与 ActivityTimeline / ActivityCard 对齐的占位：左侧竖线 + 圆点 + 分隔条，无圆角卡片块 */
+/** 与 ActivityTimeline 卡片网格对齐的占位：md+ 两列 */
 
 interface Props {
-  rows?: number;
+  /** 骨架卡片数量 */
+  cards?: number;
 }
 
-export default function TimelineListSkeleton({ rows = 4 }: Props) {
+export default function TimelineListSkeleton({ cards = 4 }: Props) {
   return (
-    <div className="relative" aria-busy aria-label="加载中">
-      <div
-        className="pointer-events-none absolute left-[13px] top-3 bottom-4 z-0 w-px md:left-[15px]"
-        style={{ background: "var(--border-strong)" }}
-        aria-hidden
-      />
-
-      <div className="relative z-[1]">
-        {Array.from({ length: rows }).map((_, i) => (
-          <div key={i} className="fade-up flex gap-3 md:gap-4">
-            <div className="relative z-[2] flex w-7 shrink-0 justify-center md:w-8">
-              <span
-                className="mt-2 block h-2.5 w-2.5 shrink-0 animate-pulse rounded-full md:h-3 md:w-3"
-                style={{
-                  background: "var(--surface-elevated)",
-                  boxShadow: "0 0 0 3px var(--surface)",
-                }}
-                aria-hidden
-              />
-            </div>
-            <div
-              className={`relative min-w-0 flex-1 pb-6 pt-0.5 md:pb-7 ${i < rows - 1 ? "border-b border-[color:var(--border)]" : ""}`}
-            >
-              <div
-                className="h-3 w-[5.5rem] max-w-[40%] animate-pulse rounded"
-                style={{ background: "var(--surface-elevated)" }}
-              />
-              <div
-                className="mt-2 h-4 w-full max-w-lg animate-pulse rounded"
-                style={{ background: "var(--surface-elevated)" }}
-              />
-              <div
-                className="mt-3 h-5 w-28 animate-pulse rounded-md"
-                style={{ background: "var(--surface-elevated)" }}
-              />
-            </div>
+    <div
+      className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4"
+      aria-busy
+      aria-label="加载中"
+    >
+      {Array.from({ length: cards }).map((_, i) => (
+        <div
+          key={i}
+          className="fade-up rounded-2xl border p-4 md:p-4"
+          style={{
+            background: "var(--surface-elevated)",
+            borderColor: "var(--border)",
+            boxShadow: "var(--shadow-sm)",
+          }}
+        >
+          <div
+            className="h-3 w-24 animate-pulse rounded"
+            style={{ background: "var(--border)" }}
+          />
+          <div
+            className="mt-3 h-4 w-full max-w-[min(100%,20rem)] animate-pulse rounded"
+            style={{ background: "var(--border)" }}
+          />
+          <div
+            className="mt-2 h-4 w-[80%] max-w-[16rem] animate-pulse rounded"
+            style={{ background: "var(--border)" }}
+          />
+          <div className="mt-4 flex gap-2">
+            <div className="h-5 w-14 animate-pulse rounded-md" style={{ background: "var(--border)" }} />
+            <div className="h-5 w-12 animate-pulse rounded-md" style={{ background: "var(--border)" }} />
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }

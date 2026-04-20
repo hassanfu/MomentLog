@@ -43,7 +43,7 @@ function TimelineTabChunkFallback() {
         />
         <div className="h-8 w-8 shrink-0 animate-pulse rounded-lg" style={{ background: "var(--surface-elevated)" }} />
       </div>
-      <TimelineListSkeleton rows={4} />
+      <TimelineListSkeleton cards={4} />
     </div>
   );
 }
