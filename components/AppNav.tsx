@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Layers, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 export default function AppNav() {
   const router = useRouter();
@@ -67,15 +67,9 @@ export default function AppNav() {
         style={{ background: "var(--nav-glass)", backdropFilter: "blur(12px)" }}
       >
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
-          <Link href="/" className="flex items-center gap-2" scroll={false}>
-            <div
-              className="flex h-7 w-7 items-center justify-center rounded-lg"
-              style={{ background: "var(--brand)" }}
-            >
-              <Layers className="h-3.5 w-3.5 text-white" strokeWidth={2} aria-hidden />
-            </div>
-            <span className="text-sm font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
-              MomentLog
+          <Link href="/" className="flex items-center" scroll={false}>
+            <span className="text-sm font-bold tracking-[0.14em]" style={{ color: "var(--text-primary)" }}>
+              MOMENTLOG
             </span>
           </Link>
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createActivity } from "@/lib/actions/activities";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { Save } from "lucide-react";
 import type { Tag } from "@/types";
 
 const PRESET_TAGS: Tag[] = ["#工作", "#学习", "#生活", "#运动", "#创作", "#社交", "#休息"];
@@ -117,10 +118,15 @@ export default function DashboardComposer() {
           type="button"
           onClick={submit}
           disabled={pending}
-          className="rounded-xl px-6 py-3 md:py-2 text-base md:text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 min-h-[48px] md:min-h-0 touch-manipulation"
-          style={{ background: "var(--brand)" }}
+          className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 md:px-4 md:py-2 text-base md:text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50 min-h-[48px] md:min-h-0 touch-manipulation"
+          style={{
+            background: "var(--brand-subtle)",
+            color: "var(--brand)",
+            border: "1px solid var(--brand)",
+          }}
         >
-          {pending ? "保存中…" : "保存记录"}
+          <Save className="h-4 w-4 shrink-0 opacity-95" strokeWidth={2} aria-hidden />
+          {pending ? "保存中…" : "保存"}
         </button>
       </div>
     </div>

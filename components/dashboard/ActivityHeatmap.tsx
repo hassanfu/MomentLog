@@ -1,6 +1,10 @@
 "use client";
 
 import { addDays, format, parseISO } from "date-fns";
+
+function todayIsoDate(): string {
+  return format(new Date(), "yyyy-MM-dd");
+}
 import { zhCN } from "date-fns/locale";
 import type { HeatmapCell } from "@/types";
 
@@ -24,6 +28,7 @@ interface Props {
 /** GitHub / flomo 风格：列=周，行=周一→周日 */
 export default function ActivityHeatmap({ cells, numWeeks, gridStart }: Props) {
   const monthLabels = buildMonthLabels(gridStart, numWeeks);
+  const todayStr = todayIsoDate();
 
   return (
     <div className="space-y-2">
@@ -42,14 +47,20 @@ export default function ActivityHeatmap({ cells, numWeeks, gridStart }: Props) {
               columnGap: GAP_PX,
             }}
           >
-            {cells.map((cell) => (
-              <div
-                key={cell.date}
-                title={`${cell.date} · ${cell.count} 条记录`}
-                className="aspect-square min-h-0 min-w-0 w-full rounded-[2px] transition-colors"
-                style={{ background: LEVEL_BG[cell.level] }}
-              />
-            ))}
+            {cells.map((cell) => {
+              const isToday = cell.date === todayStr;
+              return (
+                <div
+                  key={cell.date}
+                  title={`${cell.date} · ${cell.count} 条记录`}
+                  className="aspect-square min-h-0 min-w-0 w-full rounded-[2px] transition-colors"
+                  style={{
+                    background: LEVEL_BG[cell.level],
+                    ...(isToday ? { boxShadow: "inset 0 0 0 2px var(--brand)" } : {}),
+                  }}
+                />
+              );
+            })}
           </div>
           <div
             className="grid w-full"

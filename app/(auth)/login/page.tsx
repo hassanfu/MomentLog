@@ -8,7 +8,6 @@ import {
   signUpWithEmailClient,
   signInWithGoogleClient,
 } from "@/lib/auth-browser";
-import { Layers } from "lucide-react";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -66,14 +65,11 @@ export default function LoginPage() {
 
       <div className="w-full max-w-sm relative">
         <div className="text-center mb-8">
-          <div
-            className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4"
-            style={{ background: "var(--brand)", boxShadow: "0 8px 24px rgba(201,100,66,0.32)" }}
+          <h1
+            className="text-xl font-bold tracking-[0.14em] sm:text-2xl"
+            style={{ color: "var(--text-primary)" }}
           >
-            <Layers className="h-6 w-6 text-white" strokeWidth={2} aria-hidden />
-          </div>
-          <h1 className="text-2xl tracking-tight" style={{ color: "var(--text-primary)", letterSpacing: "-0.5px" }}>
-            MomentLog
+            MOMENTLOG
           </h1>
           <p className="mt-1 text-base md:text-sm" style={{ color: "var(--text-muted)" }}>
             记录当下，洞见未来
