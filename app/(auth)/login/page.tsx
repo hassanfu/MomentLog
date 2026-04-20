@@ -60,14 +60,14 @@ export default function LoginPage() {
       </div>
       <div
         className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-3xl pointer-events-none"
-        style={{ background: "rgba(113,50,245,0.06)" }}
+        style={{ background: "rgba(201,100,66,0.07)" }}
       />
 
       <div className="w-full max-w-sm relative">
         <div className="text-center mb-8">
           <div
             className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4"
-            style={{ background: "var(--brand)", boxShadow: "0 8px 24px rgba(113,50,245,0.3)" }}
+            style={{ background: "var(--brand)", boxShadow: "0 8px 24px rgba(201,100,66,0.32)" }}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

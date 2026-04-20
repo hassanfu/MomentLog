@@ -9,13 +9,13 @@ import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
 
 const TAG_COLORS: Record<string, string> = {
-  "#工作": "#7132f5",
+  "#工作": "#c96442",
   "#学习": "#0ea5e9",
   "#生活": "#f59e0b",
   "#运动": "#22c55e",
   "#创作": "#ec4899",
   "#社交": "#f97316",
-  "#休息": "#8b5cf6",
+  "#休息": "#d97757",
 };
 
 interface DashboardStatsProps {
@@ -69,7 +69,7 @@ export default function StatsCharts({ today, week, month }: DashboardStatsProps)
       {/* Stat cards */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "今日记录", count: today.length, minutes: todayMinutes, color: "#7132f5" },
+          { label: "今日记录", count: today.length, minutes: todayMinutes, color: "#c96442" },
           { label: "本周记录", count: week.length, minutes: weekMinutes, color: "#0ea5e9" },
           { label: "本月记录", count: month.length, minutes: monthMinutes, color: "#22c55e" },
         ].map(({ label, count, minutes, color }) => (

@@ -54,7 +54,7 @@ function BriefMarkdownBody({ text }: { text: string }) {
   const src = stripOuterMarkdownFence(text);
   return (
     <article
-      className="[&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-base [&_h3]:font-medium [&_h3:first-child]:mt-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-1 [&_p]:my-2 [&_strong]:font-medium [&_a]:underline [&_a]:opacity-90"
+      className="brief-prose-article [&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-base [&_h3]:font-medium [&_h3:first-child]:mt-0 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-1 [&_p]:my-2 [&_strong]:font-medium [&_a]:underline [&_a]:opacity-90"
       style={{ color: "var(--text-primary)" }}
     >
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{src}</ReactMarkdown>
@@ -271,7 +271,7 @@ export default function BriefPanel() {
               {isLoading ? (
                 <div
                   className="brief-card-elevated rounded-2xl border p-5 md:p-6"
-                  style={{ background: "#ffffff", borderColor: "var(--border)" }}
+                  style={{ background: "var(--surface-elevated)", borderColor: "var(--border)" }}
                 >
                   <BriefMarkdownBody text={completion} />
                 </div>
@@ -280,7 +280,7 @@ export default function BriefPanel() {
               ) : (
                 <div
                   className="brief-card-elevated rounded-2xl border p-5 md:p-6"
-                  style={{ background: "#ffffff", borderColor: "var(--border)" }}
+                  style={{ background: "var(--surface-elevated)", borderColor: "var(--border)" }}
                 >
                   <BriefMarkdownBody text={completion} />
                 </div>
@@ -320,7 +320,7 @@ export default function BriefPanel() {
                 <li key={b.id}>
                   <div
                     className="brief-card-elevated flex flex-col overflow-hidden rounded-2xl border"
-                    style={{ background: "#ffffff", borderColor: "var(--border)" }}
+                    style={{ background: "var(--surface-elevated)", borderColor: "var(--border)" }}
                   >
                     <div
                       className="flex flex-wrap items-center gap-2 justify-between px-4 py-3 gap-y-2"

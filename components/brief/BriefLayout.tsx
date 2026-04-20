@@ -18,11 +18,11 @@ export function BriefLayout({ parsed }: { parsed: ParsedBriefLayout }) {
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
         <div
           className="brief-card-elevated rounded-2xl border p-5 md:p-6"
-          style={{ background: "#ffffff", borderColor: "var(--border)" }}
+          style={{ background: "var(--surface-elevated)", borderColor: "var(--border)" }}
         >
           <h3 className="brief-serif-heading mb-3 text-[1rem] leading-snug">概述</h3>
           {parsed.overview ? (
-            <article className={mdSurface} style={{ color: "var(--text-primary)" }}>
+            <article className={`brief-prose-article ${mdSurface}`} style={{ color: "var(--text-primary)" }}>
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{parsed.overview}</ReactMarkdown>
             </article>
           ) : (
@@ -34,11 +34,11 @@ export function BriefLayout({ parsed }: { parsed: ParsedBriefLayout }) {
 
         <div
           className="brief-card-elevated rounded-2xl border p-5 md:p-6"
-          style={{ background: "#ffffff", borderColor: "var(--border)" }}
+          style={{ background: "var(--surface-elevated)", borderColor: "var(--border)" }}
         >
           <h3 className="brief-serif-heading mb-3 text-[1rem] leading-snug">建议</h3>
           {sug ? (
-            <article className={mdSurface} style={{ color: "var(--text-primary)" }}>
+            <article className={`brief-prose-article ${mdSurface}`} style={{ color: "var(--text-primary)" }}>
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{sug}</ReactMarkdown>
             </article>
           ) : (
@@ -61,7 +61,7 @@ export function BriefLayout({ parsed }: { parsed: ParsedBriefLayout }) {
           核心
         </h3>
         {parsed.core ? (
-          <article className={`${mdCore} [&_*]:text-[#faf9f5]`}>
+          <article className={`brief-prose-article ${mdCore} [&_*]:text-[#faf9f5]`}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{parsed.core}</ReactMarkdown>
           </article>
         ) : (

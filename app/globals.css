@@ -2,74 +2,87 @@
 @import "tailwindcss";
 
 :root {
-  /* Kraken-inspired design tokens */
-  --brand: #7132f5;
-  --brand-dark: #5741d8;
-  --brand-deep: #5b1ecf;
-  --brand-subtle: rgba(133, 91, 251, 0.12);
-  --brand-subtle-hover: rgba(133, 91, 251, 0.2);
+  /* MomentLog 2.1 — parchment + terracotta（全局默认） */
+  --brand: #c96442;
+  --brand-dark: #a85435;
+  --brand-deep: #8f4028;
+  --brand-subtle: rgba(201, 100, 66, 0.14);
+  --brand-subtle-hover: rgba(201, 100, 66, 0.24);
 
-  --text-primary: #101114;
-  --text-secondary: #686b82;
-  --text-muted: #9497a9;
+  --text-primary: #141413;
+  --text-secondary: #5e5d59;
+  --text-muted: #87867f;
 
-  --surface: #ffffff;
-  --surface-elevated: #f8f8fc;
-  --border: #dedee5;
-  --border-subtle: rgba(104, 107, 130, 0.16);
+  --surface: #f5f4ed;
+  --surface-elevated: #faf9f5;
+  --surface-warm-sand: #e8e6dc;
+  --border: #f0eee6;
+  --border-strong: #e8e6dc;
+  --border-subtle: rgba(94, 93, 89, 0.12);
+
+  --brief-error: #b53333;
+  --brief-error-bg: rgba(181, 51, 51, 0.09);
+  --brief-error-border: rgba(181, 51, 51, 0.22);
 
   --success: #149e61;
   --success-bg: rgba(20, 158, 97, 0.12);
   --success-text: #026b3f;
 
-  --shadow-sm: rgba(0, 0, 0, 0.03) 0px 4px 24px;
-  --shadow-xs: rgba(16, 24, 40, 0.04) 0px 1px 4px;
+  --shadow-sm: rgba(0, 0, 0, 0.06) 0px 4px 24px;
+  --shadow-xs: rgba(40, 36, 28, 0.06) 0px 1px 4px;
 
   --radius-btn: 12px;
   --radius-card: 16px;
   --radius-badge: 8px;
 
-  --heatmap-0: #ebedf0;
-  --heatmap-1: rgba(113, 50, 245, 0.18);
-  --heatmap-2: rgba(113, 50, 245, 0.38);
-  --heatmap-3: rgba(113, 50, 245, 0.62);
-  --heatmap-4: #7132f5;
+  --heatmap-0: #ebe8df;
+  --heatmap-1: rgba(201, 100, 66, 0.22);
+  --heatmap-2: rgba(201, 100, 66, 0.42);
+  --heatmap-3: rgba(201, 100, 66, 0.62);
+  --heatmap-4: #c96442;
 
-  --nav-glass: rgba(255, 255, 255, 0.88);
-  --nav-glass-mobile: rgba(255, 255, 255, 0.94);
+  --nav-glass: rgba(250, 249, 245, 0.92);
+  --nav-glass-mobile: rgba(250, 249, 245, 0.96);
   color-scheme: light;
 }
 
 .dark {
-  --brand: #8b5cf6;
-  --brand-dark: #7c3aed;
-  --brand-subtle: rgba(139, 92, 246, 0.15);
-  --brand-subtle-hover: rgba(139, 92, 246, 0.25);
+  --brand: #d97757;
+  --brand-dark: #c96442;
+  --brand-deep: #a85435;
+  --brand-subtle: rgba(217, 119, 87, 0.18);
+  --brand-subtle-hover: rgba(217, 119, 87, 0.28);
 
-  --text-primary: #f1f0f5;
-  --text-secondary: #a8a6b8;
-  --text-muted: #6b6880;
+  --text-primary: #f5f4ed;
+  --text-secondary: #b0aea5;
+  --text-muted: #87867f;
 
-  --surface: #0e0d12;
-  --surface-elevated: #15131d;
-  --border: #2a2736;
+  --surface: #141413;
+  --surface-elevated: #252522;
+  --surface-warm-sand: #30302e;
+  --border: #3d3d3a;
+  --border-strong: #30302e;
   --border-subtle: rgba(255, 255, 255, 0.08);
+
+  --brief-error: #f87171;
+  --brief-error-bg: rgba(248, 113, 113, 0.12);
+  --brief-error-border: rgba(248, 113, 113, 0.28);
 
   --success: #22c55e;
   --success-bg: rgba(34, 197, 94, 0.12);
   --success-text: #86efac;
 
-  --shadow-sm: rgba(0, 0, 0, 0.3) 0px 4px 24px;
-  --shadow-xs: rgba(0, 0, 0, 0.2) 0px 1px 4px;
+  --shadow-sm: rgba(0, 0, 0, 0.35) 0px 4px 24px;
+  --shadow-xs: rgba(0, 0, 0, 0.22) 0px 1px 4px;
 
-  --heatmap-0: #2a2736;
-  --heatmap-1: rgba(139, 92, 246, 0.22);
-  --heatmap-2: rgba(139, 92, 246, 0.45);
-  --heatmap-3: rgba(139, 92, 246, 0.65);
-  --heatmap-4: #8b5cf6;
+  --heatmap-0: #2a2926;
+  --heatmap-1: rgba(217, 119, 87, 0.25);
+  --heatmap-2: rgba(217, 119, 87, 0.48);
+  --heatmap-3: rgba(217, 119, 87, 0.68);
+  --heatmap-4: #d97757;
 
-  --nav-glass: rgba(14, 13, 18, 0.92);
-  --nav-glass-mobile: rgba(14, 13, 18, 0.96);
+  --nav-glass: rgba(20, 20, 19, 0.92);
+  --nav-glass-mobile: rgba(20, 20, 19, 0.96);
   color-scheme: dark;
 }
 
@@ -124,63 +137,15 @@ body {
   animation: fadeUp 0.3s ease forwards;
 }
 
-/* ── AI 简报 2.1：套在「AI 简报」整栏（侧栏+主内容），覆盖全局紫品牌与热力图（Design doc: 「AI 简报 2.1.rtf」）── */
-.brief-layout-v21 {
-  --brand: #c96442;
-  --brand-dark: #a85435;
-  --brand-deep: #8f4028;
-  --brand-subtle: rgba(201, 100, 66, 0.16);
-  --brand-subtle-hover: rgba(201, 100, 66, 0.26);
-
-  --text-primary: #141413;
-  --text-secondary: #5e5d59;
-  --text-muted: #87867f;
-
-  --surface: #f5f4ed;
-  --surface-elevated: #faf9f5;
-  --surface-warm-sand: #e8e6dc;
-
-  --border: #f0eee6;
-  --border-strong: #e8e6dc;
-  --border-subtle: rgba(94, 93, 89, 0.12);
-
-  --heatmap-0: #ebe8df;
-  --heatmap-1: rgba(201, 100, 66, 0.22);
-  --heatmap-2: rgba(201, 100, 66, 0.42);
-  --heatmap-3: rgba(201, 100, 66, 0.62);
-  --heatmap-4: #c96442;
-
-  --brief-error: #b53333;
-  --brief-error-bg: rgba(181, 51, 51, 0.09);
-  --brief-error-border: rgba(181, 51, 51, 0.22);
-
-  /* 深色模式下整栏仍用羊皮纸浅色，避免侧栏仍是紫/对比错误 */
-  color-scheme: light;
-  background: #f5f4ed;
-  border-radius: 28px;
-  padding: 1.25rem 1rem;
-  box-shadow: rgba(0, 0, 0, 0.06) 0px 4px 28px;
-  border: 1px solid var(--border);
-
-  color: var(--text-primary);
-  font-size: 16px;
-  line-height: 1.55;
-}
-
-@media (min-width: 1024px) {
-  .brief-layout-v21 {
-    padding: 1.5rem 1.75rem;
-  }
-}
-
-.brief-layout-v21 .brief-serif-heading {
+/* 简报模块排版工具类（令牌已由 :root / .dark 全局提供） */
+.brief-serif-heading {
   font-family: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
   font-weight: 500;
   letter-spacing: -0.03em;
   color: var(--text-primary);
 }
 
-.brief-layout-v21 .brief-section-overline {
+.brief-section-overline {
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -188,67 +153,13 @@ body {
   color: var(--text-muted);
 }
 
-.brief-layout-v21 article h1,
-.brief-layout-v21 article h2,
-.brief-layout-v21 article h3 {
+article.brief-prose-article h1,
+article.brief-prose-article h2,
+article.brief-prose-article h3 {
   font-family: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
   font-weight: 500;
-  color: var(--text-primary);
 }
 
-.brief-layout-v21 .brief-card-elevated {
-  box-shadow: rgba(0, 0, 0, 0.05) 0px 4px 24px;
-}
-
-/* BriefPanel 内层（无二次整页底色时仍兼容单独使用） */
-.brief-skin-v21 {
-  --brand: #c96442;
-  --brand-dark: #a85435;
-  --brand-subtle: rgba(201, 100, 66, 0.14);
-
-  --text-primary: #141413;
-  --text-secondary: #5e5d59;
-  --text-muted: #87867f;
-
-  --surface: transparent;
-  --surface-elevated: #faf9f5;
-  --surface-warm-sand: #e8e6dc;
-
-  --border: #f0eee6;
-  --border-strong: #e8e6dc;
-
-  --brief-error: #b53333;
-  --brief-error-bg: rgba(181, 51, 51, 0.09);
-  --brief-error-border: rgba(181, 51, 51, 0.22);
-
-  color: var(--text-primary);
-  font-size: 16px;
-  line-height: 1.55;
-}
-
-.brief-skin-v21 .brief-serif-heading {
-  font-family: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  color: var(--text-primary);
-}
-
-.brief-skin-v21 .brief-section-overline {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.brief-skin-v21 article h1,
-.brief-skin-v21 article h2,
-.brief-skin-v21 article h3 {
-  font-family: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.brief-skin-v21 .brief-card-elevated {
+.brief-card-elevated {
   box-shadow: rgba(0, 0, 0, 0.05) 0px 4px 24px;
 }

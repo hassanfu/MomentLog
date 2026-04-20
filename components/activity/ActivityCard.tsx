@@ -15,13 +15,13 @@ import {
 } from "@/components/ui/dialog";
 
 const TAG_COLORS: Record<string, string> = {
-  "#工作": "#7132f5",
+  "#工作": "#c96442",
   "#学习": "#0ea5e9",
   "#生活": "#f59e0b",
   "#运动": "#22c55e",
   "#创作": "#ec4899",
   "#社交": "#f97316",
-  "#休息": "#8b5cf6",
+  "#休息": "#d97757",
 };
 
 export default function ActivityCard({ activity }: { activity: Activity }) {

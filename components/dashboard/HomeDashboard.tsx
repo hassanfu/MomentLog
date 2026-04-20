@@ -65,13 +65,7 @@ export default function HomeDashboard({
   }, []);
 
   return (
-    <div
-      className={
-        tab === "briefs"
-          ? "brief-layout-v21 flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10"
-          : "flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10"
-      }
-    >
+    <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
       {/* 左侧：无边框分割线 */}
       <aside className="w-full shrink-0 space-y-5 pb-6 lg:w-[240px] lg:pb-0 lg:pr-4">
         <div>
