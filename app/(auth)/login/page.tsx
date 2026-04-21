@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -64,7 +65,15 @@ export default function LoginPage() {
       />
 
       <div className="w-full max-w-sm relative">
-        <div className="text-center mb-8">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <Image
+            src="/logo.png"
+            alt="MomentLog"
+            width={56}
+            height={56}
+            className="mb-3 h-14 w-14 shrink-0 rounded-xl object-cover"
+            priority
+          />
           <h1
             className="text-xl font-bold tracking-[0.14em] sm:text-2xl"
             style={{ color: "var(--text-primary)" }}

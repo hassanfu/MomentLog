@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { signOut } from "@/lib/actions/auth";
 import { useEffect, useState, useTransition } from "react";
@@ -67,7 +68,15 @@ export default function AppNav() {
         style={{ background: "var(--nav-glass)", backdropFilter: "blur(12px)" }}
       >
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
-          <Link href="/" className="flex items-center" scroll={false}>
+          <Link href="/" className="flex items-center gap-2.5" scroll={false}>
+            <Image
+              src="/logo.png"
+              alt="MomentLog"
+              width={28}
+              height={28}
+              className="h-7 w-7 shrink-0 rounded-md object-cover"
+              priority
+            />
             <span className="text-sm font-bold tracking-[0.14em]" style={{ color: "var(--text-primary)" }}>
               MOMENTLOG
             </span>

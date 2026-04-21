@@ -10,10 +10,10 @@ const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-sans",
 });
 
+// 标签页图标：同 `public/logo.png` 的 `app/icon.png`（见 /app/icon.png）
 export const metadata: Metadata = {
   title: "MomentLog — 记录当下，洞见未来",
   description: "随时记录你的活动，让 AI 为你生成专业简报，发现成长轨迹。",
-  icons: { icon: "/favicon.ico" },
 };
 
 export const viewport: Viewport = {
