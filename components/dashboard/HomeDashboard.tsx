@@ -78,6 +78,19 @@ export default function HomeDashboard({
 }: Props) {
   const searchParams = useSearchParams();
   const [tab, setTab] = useState<TabKey>(() => tabFromSearchParams(searchParams));
+  /** 与服务端 props 同步；新建记录后立即 prepend，避免整页 refresh 后才看到列表更新 */
+  const [recentList, setRecentList] = useState<Activity[]>(recent);
+
+  useEffect(() => {
+    setRecentList(recent);
+  }, [recent]);
+
+  const handleActivitySaved = useCallback((created: Activity) => {
+    setRecentList((prev) => {
+      const deduped = prev.filter((a) => a.id !== created.id);
+      return [created, ...deduped].slice(0, 60);
+    });
+  }, []);
 
   useEffect(() => {
     setTab(tabFromSearchParams(searchParams));
@@ -187,7 +200,7 @@ export default function HomeDashboard({
               </h1>
             </div>
 
-            <DashboardComposer />
+            <DashboardComposer onActivitySaved={handleActivitySaved} />
 
             <div>
               <div className="mb-3 flex items-center justify-between">
@@ -203,7 +216,7 @@ export default function HomeDashboard({
                   全部时间线
                 </button>
               </div>
-              <ActivityTimeline activities={recent} />
+              <ActivityTimeline activities={recentList} />
             </div>
           </>
         )}

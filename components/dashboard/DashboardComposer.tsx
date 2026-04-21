@@ -6,7 +6,7 @@ import { createActivity } from "@/lib/actions/activities";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Save } from "lucide-react";
-import type { Tag } from "@/types";
+import type { Activity, Tag } from "@/types";
 
 const PRESET_TAGS: Tag[] = ["#工作", "#学习", "#生活", "#运动", "#创作", "#社交", "#休息"];
 
@@ -20,7 +20,12 @@ const TAG_COLORS: Record<string, string> = {
   "#休息": "#d97757",
 };
 
-export default function DashboardComposer() {
+interface DashboardComposerProps {
+  /** 插入成功后立即合并到「最近动态」，无需等整页 refresh */
+  onActivitySaved?: (activity: Activity) => void;
+}
+
+export default function DashboardComposer({ onActivitySaved }: DashboardComposerProps) {
   const router = useRouter();
   const [desc, setDesc] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
@@ -39,7 +44,7 @@ export default function DashboardComposer() {
     }
     startTransition(async () => {
       try {
-        await createActivity({
+        const created = await createActivity({
           date: format(new Date(), "yyyy-MM-dd"),
           description: text,
           tags,
@@ -49,7 +54,9 @@ export default function DashboardComposer() {
         setDesc("");
         setTags([]);
         setDuration("");
-        router.refresh();
+        onActivitySaved?.(created);
+        // 热力图 / 侧边栏统计在后台刷新，不阻塞列表与按钮恢复
+        queueMicrotask(() => router.refresh());
       } catch (e: unknown) {
         toast.error(e instanceof Error ? e.message : "保存失败");
       }

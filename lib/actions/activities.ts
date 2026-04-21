@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { ActivityFormData, HeatmapCell, PeriodType } from "@/types";
+import type { Activity, ActivityFormData, HeatmapCell, PeriodType } from "@/types";
 import {
   startOfDay,
   endOfDay,
@@ -17,22 +17,27 @@ import {
   subWeeks,
 } from "date-fns";
 
-export async function createActivity(data: ActivityFormData) {
+export async function createActivity(data: ActivityFormData): Promise<Activity> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
 
-  const { error } = await supabase.from("activities").insert({
-    user_id: user.id,
-    date: data.date,
-    description: data.description,
-    tags: data.tags,
-    duration_minutes: data.duration_minutes,
-  });
+  const { data: row, error } = await supabase
+    .from("activities")
+    .insert({
+      user_id: user.id,
+      date: data.date,
+      description: data.description,
+      tags: data.tags,
+      duration_minutes: data.duration_minutes,
+    })
+    .select()
+    .single();
 
   if (error) throw new Error(error.message);
   revalidatePath("/");
   revalidatePath("/activities");
+  return row as Activity;
 }
 
 export async function updateActivity(id: string, data: ActivityFormData) {
