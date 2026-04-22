@@ -30,6 +30,12 @@ export default function LoginPage() {
         return;
       }
 
+      const passwordConfirm = String(formData.get("password_confirm") ?? "");
+      if (password !== passwordConfirm) {
+        toast.error("两次输入的密码不一致");
+        return;
+      }
+
       const r = await signUpWithEmailClient(email, password);
       if (!r.ok) {
         toast.error(r.message);
@@ -148,6 +154,7 @@ export default function LoginPage() {
                 name="password"
                 type="password"
                 required
+                autoComplete={mode === "signin" ? "current-password" : "new-password"}
                 placeholder="••••••••"
                 className="w-full px-3 py-3 md:py-2.5 rounded-xl text-base md:text-sm outline-none transition-all"
                 style={{
@@ -159,6 +166,28 @@ export default function LoginPage() {
                 onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
               />
             </div>
+            {mode === "signup" && (
+              <div>
+                <label className="block text-sm md:text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>
+                  确认密码
+                </label>
+                <input
+                  name="password_confirm"
+                  type="password"
+                  required
+                  autoComplete="new-password"
+                  placeholder="再次输入密码"
+                  className="w-full px-3 py-3 md:py-2.5 rounded-xl text-base md:text-sm outline-none transition-all"
+                  style={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
+                    color: "var(--text-primary)",
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--brand)")}
+                  onBlur={(e) => (e.target.style.borderColor = "var(--border)")}
+                />
+              </div>
+            )}
             <button
               type="submit"
               disabled={isPending}
