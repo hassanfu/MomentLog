@@ -1,54 +1,43 @@
 # MomentLog — 记录当下，洞见未来
 
-个人活动记录 + AI 自动简报 Web 应用。
+个人活动记录 + AI 周期回顾的 Web 应用。
 
-**技术栈**：Next.js 16 · TypeScript · Tailwind CSS v4 · Shadcn/UI · Supabase · Vercel AI SDK + Claude
+**当前形态**：纯本地演示版。所有记录与简报存档都保存在浏览器
+`localStorage` 中，不需要登录，不连后端数据库。AI 简报继续走
+DeepSeek（OpenAI 兼容接口）。
+
+**技术栈**：Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 ·
+Shadcn/UI · Vercel AI SDK + DeepSeek
 
 ---
 
 ## 快速开始
 
-### 1. 克隆并安装
-
 ```bash
 git clone <your-repo>
 cd momentlog
 npm install
-```
-
-### 2. 配置环境变量
-
-```bash
-cp .env.example .env.local
-```
-
-填入以下变量：
-
-| 变量 | 来源 |
-|------|------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API |
-| `ANTHROPIC_API_KEY` | https://console.anthropic.com/settings/keys |
-| `NEXT_PUBLIC_SITE_URL` | 本地：`http://localhost:3000` |
-
-### 3. 初始化数据库
-
-在 Supabase Dashboard → SQL Editor 中运行 `supabase-schema.sql`。
-
-### 4. 配置 Supabase Auth
-
-在 Supabase Dashboard → Authentication → Providers 中：
-- 启用 **Email** 登录
-- （可选）启用 **Google** OAuth，填入 Client ID / Secret
-- 在 URL Configuration → Redirect URLs 中添加：`http://localhost:3000/callback`
-
-### 5. 启动开发服务器
-
-```bash
+cp .env.example .env.local   # 填入 DEEPSEEK_API_KEY
 npm run dev
 ```
 
-打开 http://localhost:3000
+打开 <http://localhost:3001>（`npm run dev` 默认端口 3001），即可
+直接进入首页，无需登录。
+
+> 没有 `DEEPSEEK_API_KEY` 也能正常打开主界面、记录活动；只是
+> 「AI 简报」tab 会返回 503，提示未配置密钥。
+
+---
+
+## 数据存在哪里
+
+| 内容 | 存储位置 | localStorage key |
+|------|----------|-------------------|
+| 活动记录 | 当前浏览器 | `momentlog:activities:v1` |
+| 已保存的简报 | 当前浏览器 | `momentlog:saved-briefs:v1` |
+
+换浏览器、换设备、清缓存 / 隐身窗口 都会丢失数据。
+两个 tab 之间通过 `storage` 事件实时同步。
 
 ---
 
@@ -59,12 +48,20 @@ npm i -g vercel
 vercel --prod
 ```
 
-在 Vercel Dashboard → Settings → Environment Variables 中添加所有环境变量。
+只需在 Vercel → Settings → Environment Variables 配置一个变量：
 
-记得将 `NEXT_PUBLIC_SITE_URL` 改为你的 Vercel 域名，并在 Supabase 的 Redirect URLs 中添加：
+| 变量 | 来源 |
+|------|------|
+| `DEEPSEEK_API_KEY` | <https://platform.deepseek.com/api_keys> |
+
+也可以本机已经 `npx vercel link` 之后运行：
+
+```bash
+npm run vercel:push-deepseek
 ```
-https://your-app.vercel.app/callback
-```
+
+会把 `.env.local` 里的 `DEEPSEEK_API_KEY` 同步到 Vercel 的
+Production / Preview / Development 三套环境。
 
 ---
 
@@ -72,18 +69,22 @@ https://your-app.vercel.app/callback
 
 | 功能 | 描述 |
 |------|------|
-| 🔐 Auth | Google / Email 登录，Supabase RLS 保护数据 |
-| ✍️ 快速记录 | 时间、描述、标签、时长 |
+| ✍️ 快速记录 | 描述、标签、时长，本地保存即写即用 |
 | 📅 时间线 | 日 / 周 / 月 / 年视图，带导航 |
-| 🤖 AI 简报 | 今日 / 本周 / 本月 / 年度，流式输出 |
-| 📊 仪表盘 | 记录统计、每日条形图、标签分布 |
+| 🤖 AI 简报 | 今日 / 本周 / 本月 / 本年，流式输出 + 保存草稿 |
+| 📊 仪表盘 | 活跃度热力图、记录数 / 标签数 / 活跃天数 |
+| 🌗 主题切换 | 浅 / 深主题持久化在浏览器 |
 
 ---
 
-## 在 Cursor 中继续迭代
+## 关键源码索引
 
-- **添加标签颜色自定义**：修改 `components/activity/ActivityForm.tsx` 中的 `TAG_COLORS`
-- **调整 AI Prompt**：修改 `lib/prompts.ts` 中的 `buildBriefPrompt`
-- **切换 AI 模型**：在 `app/api/brief/route.ts` 中修改 `anthropic("claude-3-5-haiku-20241022")`
-- **添加暗黑模式切换**：引入 `next-themes`，在 `app/layout.tsx` 中包裹 `ThemeProvider`
-- **保存历史简报**：在 Supabase 添加 `briefs` 表，在 `BriefPanel.tsx` 的 `onFinish` 中调用 Server Action 保存
+- `lib/local-store/activities.ts` — 活动记录的 localStorage CRUD、
+  时间线 / 热力图 / 侧栏统计的派生计算、跨标签订阅。
+- `lib/local-store/saved-briefs.ts` — 已保存简报的 localStorage CRUD。
+- `app/api/brief/route.ts` — DeepSeek 调用入口；无状态，
+  活动数据由客户端在请求体中传入。
+- `lib/prompts.ts` — 简报 Prompt 模板。
+- `components/dashboard/HomeDashboard.tsx` — 首页 tab 切换与本地数据注水。
+- `proxy.ts` — Next 中间件，把旧版 `/login` `/callback` `/activities`
+  `/briefs` 路径重定向到当前的 tab。
