@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { deleteActivity } from "@/lib/actions/activities";
+import { deleteLocalActivity } from "@/lib/local-store/activities";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
@@ -31,9 +31,9 @@ export default function ActivityCard({ activity }: { activity: Activity }) {
 
   function handleDelete() {
     if (!confirm("确定删除这条记录？")) return;
-    startTransition(async () => {
+    startTransition(() => {
       try {
-        await deleteActivity(activity.id);
+        deleteLocalActivity(activity.id);
         toast.success("已删除");
       } catch {
         toast.error("删除失败");

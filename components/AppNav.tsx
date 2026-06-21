@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { signOut } from "@/lib/actions/auth";
-import { useEffect, useState, useTransition } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   DASHBOARD_NAV,
@@ -13,25 +12,14 @@ import {
   tabFromSearchParams,
   type DashboardTabKey,
 } from "@/lib/dashboard-nav";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
 
+/**
+ * 纯本地演示：不再有登录/退出。底部导航只剩三个 tab。
+ */
 export default function AppNav() {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [pending, startTransition] = useTransition();
-  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
-  /** 与 HomeDashboard 同步：客户端 tab 事件 + URL，避免 Link 触发的软导航滞后 */
   const [dashboardTab, setDashboardTab] = useState<DashboardTabKey | null>(() =>
     pathname === "/" ? tabFromSearchParams(searchParams) : null,
   );
@@ -49,17 +37,6 @@ export default function AppNav() {
     window.addEventListener(DASHBOARD_TAB_NAV_EVENT, onTab as EventListener);
     return () => window.removeEventListener(DASHBOARD_TAB_NAV_EVENT, onTab as EventListener);
   }, []);
-
-  function executeSignOut() {
-    startTransition(async () => {
-      const r = await signOut();
-      if (r.ok) {
-        setLogoutConfirmOpen(false);
-        router.push("/login");
-        router.refresh();
-      }
-    });
-  }
 
   return (
     <>
@@ -84,24 +61,10 @@ export default function AppNav() {
 
           <div className="flex flex-1 justify-end shrink-0 items-center gap-2">
             <ThemeToggle />
-            <button
-              type="button"
-              onClick={() => setLogoutConfirmOpen(true)}
-              disabled={pending}
-              aria-label="退出登录"
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-opacity hover:opacity-90 disabled:opacity-50"
-              style={{
-                background: "var(--brand-subtle)",
-                color: "var(--brand)",
-              }}
-            >
-              <LogOut className="h-4 w-4" strokeWidth={2} aria-hidden />
-            </button>
           </div>
         </div>
       </header>
 
-      {/* 首页主题切换在 HomeDashboard 用户信息行顶对齐；其它路径保留右上角 */}
       {pathname !== "/" && (
         <div
           className="fixed right-4 z-50 md:hidden"
@@ -112,7 +75,7 @@ export default function AppNav() {
       )}
 
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 md:hidden"
+        className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-3 md:hidden"
         style={{
           background: "var(--nav-glass-mobile)",
           backdropFilter: "blur(16px)",
@@ -136,54 +99,7 @@ export default function AppNav() {
             </button>
           );
         })}
-        <button
-          type="button"
-          onClick={() => setLogoutConfirmOpen(true)}
-          disabled={pending}
-          aria-label="退出登录"
-          className="flex flex-col items-center justify-center gap-0.5 py-3 transition-opacity hover:opacity-80 disabled:opacity-50"
-          style={{ color: "var(--text-muted)" }}
-        >
-          <LogOut className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
-          <span className="text-[10px] font-medium">{pending ? "…" : "退出"}</span>
-        </button>
       </nav>
-
-      <Dialog open={logoutConfirmOpen} onOpenChange={setLogoutConfirmOpen}>
-        <DialogContent
-          className="sm:max-w-sm"
-          style={{ background: "var(--surface-elevated)", border: "1px solid var(--border)" }}
-          showCloseButton
-        >
-          <DialogHeader>
-            <DialogTitle style={{ color: "var(--text-primary)" }}>退出登录</DialogTitle>
-            <DialogDescription style={{ color: "var(--text-muted)" }}>
-              确定要退出当前账户吗？退出后需要重新登录才能继续使用。
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="mx-0 mb-0 flex-row justify-end gap-2 border-0 bg-transparent px-4 pb-4 pt-4 sm:justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={pending}
-              onClick={() => setLogoutConfirmOpen(false)}
-              className="touch-manipulation"
-            >
-              取消
-            </Button>
-            <Button
-              type="button"
-              disabled={pending}
-              onClick={executeSignOut}
-              className="touch-manipulation text-white"
-              style={{ background: "var(--brand)" }}
-            >
-              {pending ? "退出中…" : "退出"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
-

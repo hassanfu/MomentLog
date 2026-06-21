@@ -8,7 +8,13 @@ import { zhCN } from "date-fns/locale";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
-import { listSavedBriefs, saveBriefMarkdown, deleteSavedBrief } from "@/lib/actions/saved-briefs";
+import {
+  listLocalSavedBriefs,
+  saveLocalBriefMarkdown,
+  deleteLocalSavedBrief,
+  subscribeLocalSavedBriefs,
+} from "@/lib/local-store/saved-briefs";
+import { getLocalActivitiesByPeriod } from "@/lib/local-store/activities";
 import { PERIOD_LABEL_CN } from "@/lib/brief-period";
 import { parseBriefMarkdown, shouldUseBriefLayout, stripOuterMarkdownFence } from "@/lib/brief-markdown-parse";
 import { BriefLayout } from "@/components/brief/BriefLayout";
@@ -74,7 +80,6 @@ function BriefMarkdownBody({ text }: { text: string }) {
 export default function BriefPanel() {
   const [period, setPeriod] = useState<PeriodType>("day");
   const [saved, setSaved] = useState<SavedBrief[]>([]);
-  const [sendingId, setSendingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   /** 当前「本次生成」是否已成功手动保存（新生成或重新生成会清零） */
   const [draftSaved, setDraftSaved] = useState(false);
@@ -85,13 +90,16 @@ export default function BriefPanel() {
     refDate: format(new Date(), "yyyy-MM-dd"),
   });
 
-  const refreshSaved = useCallback(async () => {
-    const rows = await listSavedBriefs();
-    setSaved(rows);
+  const refreshSaved = useCallback(() => {
+    setSaved(listLocalSavedBriefs());
   }, []);
 
   useEffect(() => {
     refreshSaved();
+    const unsub = subscribeLocalSavedBriefs(refreshSaved);
+    return () => {
+      unsub();
+    };
   }, [refreshSaved]);
 
   const { completion, complete, isLoading, error } = useCompletion({
@@ -99,12 +107,12 @@ export default function BriefPanel() {
     credentials: "same-origin",
   });
 
-  async function handleSaveDraft() {
+  function handleSaveDraft() {
     const trimmed = completion?.trim();
     if (!trimmed) return;
     setSavingDraft(true);
     const { period: p, refDate } = genContextRef.current;
-    const result = await saveBriefMarkdown({
+    const result = saveLocalBriefMarkdown({
       markdown: trimmed,
       period: p,
       referenceDate: refDate,
@@ -112,11 +120,9 @@ export default function BriefPanel() {
     if (result.ok) {
       setDraftSaved(true);
       toast.success("已保存到下方「已保存的简报」");
-      await refreshSaved();
+      refreshSaved();
     } else {
-      toast.error(result.error ?? "保存失败", {
-        description: "若尚未在 Supabase 创建表，请在 SQL 编辑器执行 supabase/migrations 中的 saved_briefs 脚本。",
-      });
+      toast.error(result.error ?? "保存失败");
     }
     setSavingDraft(false);
   }
@@ -126,36 +132,16 @@ export default function BriefPanel() {
     const refDate = format(new Date(), "yyyy-MM-dd");
     genContextRef.current = { period: p, refDate };
     setPeriod(p);
+    // 把本地活动一并传给 API：服务端无登录态，不再回查 Supabase
+    const activities = getLocalActivitiesByPeriod(p, refDate);
     await complete("", {
-      body: { period: p, referenceDate: refDate },
+      body: { period: p, referenceDate: refDate, activities },
     });
   }
 
-  async function handleSendEmail(id: string) {
-    setSendingId(id);
-    try {
-      const res = await fetch("/api/brief/email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({ id }),
-      });
-      const data = (await res.json()) as { ok?: boolean; error?: string };
-      if (!res.ok) {
-        toast.error(data.error ?? "发送失败");
-        return;
-      }
-      toast.success("已发送到你的登录邮箱");
-    } catch {
-      toast.error("网络异常，发送失败");
-    } finally {
-      setSendingId(null);
-    }
-  }
-
-  async function handleDelete(id: string) {
+  function handleDelete(id: string) {
     setDeletingId(id);
-    const result = await deleteSavedBrief(id);
+    const result = deleteLocalSavedBrief(id);
     if (result.ok) {
       toast.success("已删除");
       setSaved((prev) => prev.filter((x) => x.id !== id));
@@ -187,7 +173,7 @@ export default function BriefPanel() {
       <div>
         <h1 className="brief-serif-heading text-xl leading-[1.15] sm:text-[1.35rem]">AI 简报</h1>
         <p className="mt-2 max-w-xl text-[0.9375rem] leading-relaxed" style={{ color: "var(--text-muted)" }}>
-          基于你的记录生成回顾；需要保留时在「本次生成」里点保存，再在下方列表中删除或发邮件
+          基于你的本地记录生成回顾；保存后会出现在下方列表，所有数据仅保留在当前浏览器
         </p>
       </div>
 
@@ -322,7 +308,7 @@ export default function BriefPanel() {
               color: "var(--text-muted)",
             }}
           >
-            还没有存档。在「本次生成」里点击「保存到列表」后，简报会出现在这里；可删除或发到登录邮箱。
+            还没有存档。在「本次生成」里点击「保存到列表」后，简报会出现在这里（仅保存于当前浏览器，可随时删除）。
           </div>
         ) : (
           <ul className="space-y-3">
@@ -348,19 +334,6 @@ export default function BriefPanel() {
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <button
-                          type="button"
-                          disabled={sendingId === b.id}
-                          onClick={() => handleSendEmail(b.id)}
-                          className="rounded-[10px] px-3 py-2 text-[12px] font-medium transition-opacity disabled:opacity-50 hover:opacity-90"
-                          style={{
-                            background: "var(--brand-subtle)",
-                            color: "var(--brand)",
-                            boxShadow: "inset 0 0 0 1px rgba(201, 100, 66, 0.2)",
-                          }}
-                        >
-                          {sendingId === b.id ? "发送中…" : "发邮件"}
-                        </button>
                         <button
                           type="button"
                           disabled={deletingId === b.id}

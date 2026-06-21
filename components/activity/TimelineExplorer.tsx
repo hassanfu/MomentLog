@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
-import { getActivities } from "@/lib/actions/activities";
+import { useState, useEffect } from "react";
+import {
+  getLocalActivitiesByPeriod,
+  subscribeLocalActivities,
+} from "@/lib/local-store/activities";
 import ActivityTimeline from "@/components/activity/ActivityTimeline";
 import TimelineListSkeleton from "@/components/activity/TimelineListSkeleton";
 import type { Activity, PeriodType } from "@/types";
@@ -31,15 +34,18 @@ export default function TimelineExplorer() {
   const [referenceDate, setReferenceDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [, startTransition] = useTransition();
 
   useEffect(() => {
     setIsLoading(true);
-    startTransition(async () => {
-      const data = await getActivities(period, referenceDate);
-      setActivities(data);
+    const refresh = () => {
+      setActivities(getLocalActivitiesByPeriod(period, referenceDate));
       setIsLoading(false);
-    });
+    };
+    refresh();
+    const unsub = subscribeLocalActivities(refresh);
+    return () => {
+      unsub();
+    };
   }, [period, referenceDate]);
 
   function navigate(direction: "prev" | "next") {

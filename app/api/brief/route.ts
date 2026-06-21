@@ -1,8 +1,6 @@
 import { streamText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { getErrorMessage } from "@ai-sdk/provider";
-import { createClient } from "@/lib/supabase/server";
-import { getActivities } from "@/lib/actions/activities";
 import { getPeriodBounds } from "@/lib/brief-period";
 import { computeBriefPromptStats } from "@/lib/brief-stats";
 import type { BriefActivityRow, BriefPeriod } from "@/lib/prompts";
@@ -108,23 +106,24 @@ export async function POST(req: Request) {
     fetch: deepseekCompatibleFetch,
   });
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return new Response("Unauthorized", { status: 401 });
-
-  const { period, referenceDate } = (await req.json()) as { period: PeriodType; referenceDate: string };
+  /**
+   * 纯本地演示：活动数据由客户端 localStorage 提供并随请求传入；
+   * 服务端只做无状态调用，不再读取 Supabase 用户。
+   */
+  const { period, referenceDate, activities = [] } = (await req.json()) as {
+    period: PeriodType;
+    referenceDate: string;
+    activities?: Activity[];
+  };
 
   const { periodStart, periodEnd } = getPeriodBounds(referenceDate, period);
 
-  const activities = (await getActivities(period, referenceDate)) as Activity[];
-
-  const stats = computeBriefPromptStats(activities);
-  const rows: BriefActivityRow[] = activities.map((a) => ({
+  const safeActivities = Array.isArray(activities) ? activities : [];
+  const stats = computeBriefPromptStats(safeActivities);
+  const rows: BriefActivityRow[] = safeActivities.map((a) => ({
     title: (a.description ?? "").trim() || "（无描述）",
-    tags: a.tags as string[],
-    durationMinutes: a.duration_minutes,
+    tags: (a.tags ?? []) as string[],
+    durationMinutes: a.duration_minutes ?? null,
   }));
 
   const prompt = buildBriefPrompt({

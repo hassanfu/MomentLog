@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { createActivity } from "@/lib/actions/activities";
+import { createLocalActivity } from "@/lib/local-store/activities";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Save } from "lucide-react";
@@ -26,7 +25,6 @@ interface DashboardComposerProps {
 }
 
 export default function DashboardComposer({ onActivitySaved }: DashboardComposerProps) {
-  const router = useRouter();
   const [desc, setDesc] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
   const [duration, setDuration] = useState("");
@@ -42,9 +40,9 @@ export default function DashboardComposer({ onActivitySaved }: DashboardComposer
       toast.error("写点什么再保存吧");
       return;
     }
-    startTransition(async () => {
+    startTransition(() => {
       try {
-        const created = await createActivity({
+        const created = createLocalActivity({
           date: format(new Date(), "yyyy-MM-dd"),
           description: text,
           tags,
@@ -55,8 +53,6 @@ export default function DashboardComposer({ onActivitySaved }: DashboardComposer
         setTags([]);
         setDuration("");
         onActivitySaved?.(created);
-        // 热力图 / 侧边栏统计在后台刷新，不阻塞列表与按钮恢复
-        queueMicrotask(() => router.refresh());
       } catch (e: unknown) {
         toast.error(e instanceof Error ? e.message : "保存失败");
       }

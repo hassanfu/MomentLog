@@ -7,6 +7,12 @@ import type { HeatmapCell } from "@/types";
 import type { Activity } from "@/types";
 import ActivityHeatmap from "@/components/dashboard/ActivityHeatmap";
 import ActivityTimeline from "@/components/activity/ActivityTimeline";
+import {
+  getLocalHeatmap,
+  getLocalSidebarMetrics,
+  getRecentLocalActivities,
+  subscribeLocalActivities,
+} from "@/lib/local-store/activities";
 import TimelineListSkeleton from "@/components/activity/TimelineListSkeleton";
 import DashboardComposer from "@/components/dashboard/DashboardComposer";
 import {
@@ -58,9 +64,6 @@ const BriefPanel = dynamic(() => import("@/components/brief/BriefPanel"), {
 });
 
 interface Props {
-  heatmap: { cells: HeatmapCell[]; numWeeks: number; gridStart: string } | null;
-  metrics: { totalRecords: number; tagCount: number; activeDays: number } | null;
-  recent: Activity[];
   userLabel: string;
   todayLabel: string;
   greeting: string;
@@ -68,29 +71,42 @@ interface Props {
 
 type TabKey = DashboardTabKey;
 
-export default function HomeDashboard({
-  heatmap,
-  metrics,
-  recent,
-  userLabel,
-  todayLabel,
-  greeting,
-}: Props) {
+export default function HomeDashboard({ userLabel, todayLabel, greeting }: Props) {
   const searchParams = useSearchParams();
   const [tab, setTab] = useState<TabKey>(() => tabFromSearchParams(searchParams));
-  /** 与服务端 props 同步；新建记录后立即 prepend，避免整页 refresh 后才看到列表更新 */
-  const [recentList, setRecentList] = useState<Activity[]>(recent);
+  /** 客户端从 localStorage 注水：首次渲染先空，挂载后立即填充 */
+  const [recentList, setRecentList] = useState<Activity[]>([]);
+  const [heatmap, setHeatmap] = useState<{
+    cells: HeatmapCell[];
+    numWeeks: number;
+    gridStart: string;
+  } | null>(null);
+  const [metrics, setMetrics] = useState<{ totalRecords: number; tagCount: number; activeDays: number } | null>(null);
+
+  const reloadFromLocal = useCallback(() => {
+    setRecentList(getRecentLocalActivities(60));
+    setHeatmap(getLocalHeatmap(12));
+    setMetrics(getLocalSidebarMetrics());
+  }, []);
 
   useEffect(() => {
-    setRecentList(recent);
-  }, [recent]);
+    reloadFromLocal();
+    const unsub = subscribeLocalActivities(reloadFromLocal);
+    return () => {
+      unsub();
+    };
+  }, [reloadFromLocal]);
 
   const handleActivitySaved = useCallback((created: Activity) => {
     setRecentList((prev) => {
       const deduped = prev.filter((a) => a.id !== created.id);
       return [created, ...deduped].slice(0, 60);
     });
+    // 热力图 / 侧栏统计在订阅回调中也会自动跟随，这里立即更新一次更跟手
+    setHeatmap(getLocalHeatmap(12));
+    setMetrics(getLocalSidebarMetrics());
   }, []);
+
 
   useEffect(() => {
     setTab(tabFromSearchParams(searchParams));

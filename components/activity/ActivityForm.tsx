@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createActivity, updateActivity } from "@/lib/actions/activities";
+import { createLocalActivity, updateLocalActivity } from "@/lib/local-store/activities";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import type { Activity, Tag } from "@/types";
@@ -54,13 +54,13 @@ export default function ActivityForm({ activity, onSuccess }: Props) {
         : null,
     };
 
-    startTransition(async () => {
+    startTransition(() => {
       try {
         if (activity) {
-          await updateActivity(activity.id, data);
+          updateLocalActivity(activity.id, data);
           toast.success("记录已更新");
         } else {
-          await createActivity(data);
+          createLocalActivity(data);
           toast.success("记录成功！");
         }
         onSuccess?.();

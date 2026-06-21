@@ -1,24 +1,13 @@
 import { Suspense } from "react";
-import { createClient } from "@/lib/supabase/server";
-import {
-  getHeatmapData,
-  getSidebarMetrics,
-  getRecentActivities,
-} from "@/lib/actions/activities";
 import HomeDashboard from "@/components/dashboard/HomeDashboard";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
 
-export default async function DashboardPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  const [heatmap, metrics, recent] = await Promise.all([
-    getHeatmapData(12),
-    getSidebarMetrics(),
-    getRecentActivities(40),
-  ]);
-
+/**
+ * 纯本地演示：服务端不再读取用户数据；首屏占位空数据，
+ * HomeDashboard 在客户端挂载后再从 localStorage 注入真实数据。
+ */
+export default function DashboardPage() {
   const greeting = (() => {
     const h = new Date().getHours();
     if (h < 6) return "深夜好";
@@ -29,7 +18,6 @@ export default async function DashboardPage() {
   })();
 
   const todayLabel = format(new Date(), "M月d日 EEEE", { locale: zhCN });
-  const userLabel = user?.email?.split("@")[0] ?? "用户";
 
   return (
     <Suspense
@@ -40,14 +28,7 @@ export default async function DashboardPage() {
         </div>
       }
     >
-      <HomeDashboard
-        heatmap={heatmap}
-        metrics={metrics}
-        recent={recent}
-        userLabel={userLabel}
-        todayLabel={todayLabel}
-        greeting={greeting}
-      />
+      <HomeDashboard userLabel="本地访客" todayLabel={todayLabel} greeting={greeting} />
     </Suspense>
   );
 }
